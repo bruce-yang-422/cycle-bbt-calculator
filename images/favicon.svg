@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pink" x1="256" y1="60" x2="256" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff4166"/>
+      <stop offset="1" stop-color="#ff6f86"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="104" y1="350" x2="408" y2="216" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5a45f5"/>
+      <stop offset="1" stop-color="#6b55f7"/>
+    </linearGradient>
+    <linearGradient id="heart" x1="155" y1="176" x2="155" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff4f70"/>
+      <stop offset="1" stop-color="#ff7187"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="58" y="76" width="396" height="365" rx="64" fill="url(#pink)"/>
+  <rect x="70" y="141" width="372" height="288" rx="44" fill="#ffffff"/>
+  <rect x="136" y="45" width="38" height="83" rx="19" fill="#ffffff" stroke="#ff4166" stroke-width="15"/>
+  <rect x="338" y="45" width="38" height="83" rx="19" fill="#ffffff" stroke="#ff4166" stroke-width="15"/>
+
+  <path d="M98 211C98 193 112 180 129 180C141 180 151 186 157 197C163 186 174 180 186 180C203 180 217 193 217 211C217 246 157 279 157 279C157 279 98 246 98 211Z" fill="url(#heart)"/>
+
+  <path d="M102 348C132 370 163 374 191 357C220 340 236 313 264 304C289 296 310 303 330 284C352 263 374 244 407 226" stroke="url(#purple)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="102" cy="348" r="24" fill="#5a45f5"/>
+  <circle cx="264" cy="304" r="27" fill="#614cf6"/>
+  <circle cx="407" cy="226" r="28" fill="#6b55f7"/>
+
+  <path d="M400 296C364 307 337 340 337 380C337 427 374 465 420 468C402 485 378 496 351 496C295 496 250 451 250 395C250 341 292 297 345 294C363 287 384 287 400 296Z" fill="#ff5c78"/>
+</svg>

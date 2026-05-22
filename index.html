@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>週期體溫避孕計算器</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <style>
+/* ─────────────────────────────────────────────
+   Design tokens
+───────────────────────────────────────────── */
+:root {
+  --pink:        #e8637a;
+  --pink-light:  #f4a0b0;
+  --pink-pale:   #fdf0f2;
+  --pink-bg:     #fef6f7;
+  --fertile-bg:  #fde8eb;
+  --ovul-color:  #f0a830;
+  --ovul-bg:     #fff5d6;
+  --safe-color:  #4caf7d;
+  --safe-bg:     #e8f5ee;
+  --purple:      #7c5cbf;
+  --purple-bg:   #ede8f8;
+  --period-bg:   #fce4ec;
+  --text:        #3d1f2b;
+  --text-sub:    #9a8085;
+  --border:      #f0e4e6;
+  --white:       #ffffff;
+  --shadow:      0 4px 24px rgba(232,99,122,.10);
+  --shadow-sm:   0 2px 12px rgba(232,99,122,.07);
+  --r:           18px;
+  --r-sm:        12px;
+  --nav-h:       68px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;
+  background:var(--pink-bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ─────────────────────────────────────────────
+   Bottom nav  (mobile)
+───────────────────────────────────────────── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--nav-h);
+  background:var(--white);
+  border-top:1px solid var(--border);
+  display:flex;z-index:300;
+  box-shadow:0 -4px 20px rgba(0,0,0,.06);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  border:none;background:transparent;cursor:pointer;
+  font-size:10px;font-weight:700;color:var(--text-sub);
+  transition:color .2s;padding:8px 4px;
+}
+.nav-btn.active{color:var(--pink);}
+.nav-icon{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;transition:background .2s;
+}
+.nav-btn.active .nav-icon{background:var(--pink-pale);}
+
+/* ─────────────────────────────────────────────
+   Desktop header  (≥768px)
+───────────────────────────────────────────── */
+.desk-header{
+  display:none;
+  align-items:center;justify-content:space-between;
+  padding:0 32px;height:58px;
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:200;
+}
+.desk-logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:15px;font-weight:800;color:var(--pink);
+}
+.desk-logo-icon{
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,#fce4ec,#f8bbd9);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.desk-tabs{display:flex;gap:2px;}
+.desk-tab{
+  padding:7px 20px;border:none;background:transparent;
+  border-radius:20px;font-size:13px;font-weight:700;
+  color:var(--text-sub);cursor:pointer;transition:all .2s;
+}
+.desk-tab.active,.desk-tab:hover{background:var(--pink-pale);color:var(--pink);}
+
+/* ─────────────────────────────────────────────
+   Main area / pages
+───────────────────────────────────────────── */
+.app-body{
+  padding:16px 16px calc(var(--nav-h) + 12px);
+  max-width:700px;margin:0 auto;
+}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ─────────────────────────────────────────────
+   Shared atoms
+───────────────────────────────────────────── */
+.hidden{display:none!important;}
+.card{
+  background:var(--white);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:18px 16px;margin-bottom:14px;
+}
+.card-sm{
+  background:var(--white);border-radius:var(--r-sm);
+  box-shadow:var(--shadow-sm);padding:14px 16px;margin-bottom:10px;
+}
+.section-title{
+  font-size:19px;font-weight:800;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title span{font-size:22px;}
+
+/* field */
+.field-label{
+  display:block;font-size:12px;font-weight:700;
+  color:var(--text-sub);margin-bottom:5px;
+}
+.field-input{
+  width:100%;padding:10px 12px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-size:15px;color:var(--text);background:#fafafa;
+  outline:none;transition:border .2s;font-family:inherit;
+}
+.field-input:focus{border-color:var(--pink);background:var(--white);}
+.two-col{display:flex;gap:10px;}
+.two-col>div{flex:1;}
+
+/* radio pills */
+.radio-group{display:flex;gap:8px;flex-wrap:wrap;}
+.radio-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:8px 16px;border:1.5px solid var(--border);
+  border-radius:20px;font-size:13px;font-weight:700;
+  color:var(--text-sub);cursor:pointer;transition:all .2s;
+}
+.radio-pill input[type=radio]{display:none;}
+.radio-pill.on{border-color:var(--pink);background:var(--pink-pale);color:var(--pink);}
+
+/* buttons */
+.btn-primary{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--pink),#c0392b);
+  color:var(--white);border:none;border-radius:var(--r-sm);
+  font-size:15px;font-weight:800;cursor:pointer;
+  transition:opacity .2s,transform .1s;font-family:inherit;
+  letter-spacing:.3px;
+}
+.btn-primary:hover{opacity:.9;}
+.btn-primary:active{transform:scale(.98);}
+.btn-outline{
+  width:100%;padding:11px;
+  background:var(--white);color:var(--pink);
+  border:1.5px solid var(--pink);border-radius:var(--r-sm);
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+}
+.btn-outline:hover{background:var(--pink-pale);}
+.btn-sm-green{
+  background:var(--white);border:1.5px solid var(--safe-color);
+  color:var(--safe-color);border-radius:8px;
+  padding:5px 12px;font-size:12px;font-weight:700;
+  cursor:pointer;margin-top:6px;transition:all .2s;font-family:inherit;
+}
+.btn-sm-green:hover{background:var(--safe-bg);}
+.btn-del{
+  background:none;border:none;cursor:pointer;
+  color:#ccc;font-size:16px;padding:4px;
+  transition:color .2s;line-height:1;
+}
+.btn-del:hover{color:var(--pink);}
+
+/* ─────────────────────────────────────────────
+   STM today status card
+───────────────────────────────────────────── */
+.stm-card{
+  border-radius:var(--r);padding:15px 16px;margin-bottom:14px;
+  border:2px solid transparent;
+}
+.stm-card.green {background:#e6f7ed;border-color:#4caf7d;}
+.stm-card.red   {background:var(--pink-pale);border-color:var(--pink);}
+.stm-card.yellow{background:#fffbe6;border-color:var(--ovul-color);}
+.stm-card.grey  {background:#f5f3f7;border-color:#ddd;}
+.stm-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.stm-emoji{font-size:22px;}
+.stm-title{font-size:14px;font-weight:800;}
+.stm-card.green  .stm-title{color:#1a5c34;}
+.stm-card.red    .stm-title{color:#b00020;}
+.stm-card.yellow .stm-title{color:#7a5800;}
+.stm-card.grey   .stm-title{color:#57606f;}
+.stm-rows{display:grid;gap:5px;}
+.stm-row{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:12px;line-height:1.5;
+  background:rgba(255,255,255,.65);
+  border-radius:8px;padding:7px 10px;
+}
+.stm-row b{font-weight:700;margin-right:3px;}
+
+/* ─────────────────────────────────────────────
+   Calendar header (month nav + title)
+───────────────────────────────────────────── */
+.cal-nav{
+  display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:14px;
+}
+.cal-nav-btn{
+  width:32px;height:32px;border:none;
+  background:var(--pink-pale);color:var(--pink);
+  border-radius:50%;font-size:18px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:background .2s;
+}
+.cal-nav-btn:hover{background:#fce0e4;}
+.cal-month{font-size:16px;font-weight:800;}
+
+/* weekday row */
+.cal-wds{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  margin-bottom:5px;
+}
+.cal-wd{
+  text-align:center;font-size:11px;font-weight:700;
+  color:var(--text-sub);padding:3px 0;
+}
+.cal-wd:first-child{color:var(--pink);}
+.cal-wd:last-child {color:#5b8cf5;}
+
+/* day cells */
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:3px;margin-bottom:12px;
+}
+.cal-cell{
+  aspect-ratio:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:50%;font-size:13px;font-weight:600;
+  cursor:pointer;position:relative;transition:transform .15s;
+  color:var(--text);
+}
+.cal-cell:hover{transform:scale(1.1);}
+.cal-cell.other {color:#d8ccd0;}
+.cal-cell.period{background:var(--period-bg);color:var(--pink);}
+.cal-cell.fertile{background:var(--fertile-bg);color:#c0392b;}
+.cal-cell.ovulation{
+  background:var(--ovul-color);color:var(--white);
+  box-shadow:0 0 0 3px rgba(240,168,48,.3);
+}
+.cal-cell.safe{background:var(--safe-bg);color:var(--safe-color);}
+.cal-cell.bbt-ov{background:var(--purple);color:var(--white);}
+.cal-cell.bbt-hi{background:var(--purple-bg);color:var(--purple);}
+.cal-cell.today{box-shadow:0 0 0 2.5px var(--pink)!important;}
+.cal-cell.sel  {box-shadow:0 0 0 2.5px #333!important;}
+.cell-bbt-dot{
+  position:absolute;bottom:2px;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--purple);
+}
+
+/* legend */
+.legend{
+  display:flex;flex-wrap:wrap;gap:6px 14px;
+  padding-top:8px;border-top:1px solid var(--border);
+}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-sub);font-weight:600;}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* ─────────────────────────────────────────────
+   Status info cards  (排卵日 / 受孕期 / 安全期)
+───────────────────────────────────────────── */
+.status-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:14px;
+}
+.status-card{
+  border-radius:var(--r-sm);padding:14px 12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.status-card.ov  {background:var(--purple-bg);}
+.status-card.fer {background:var(--ovul-bg);}
+.status-card.saf {background:var(--safe-bg);}
+.sc-icon{font-size:20px;}
+.sc-label{font-size:10px;font-weight:700;color:var(--text-sub);}
+.sc-value{font-size:14px;font-weight:800;line-height:1.25;}
+.sc-sub  {font-size:10px;color:var(--text-sub);}
+.status-card.ov  .sc-value{color:var(--purple);}
+.status-card.fer .sc-value{color:var(--ovul-color);}
+.status-card.saf .sc-value{color:var(--safe-color);}
+
+/* detail panel */
+.detail-panel{
+  border-radius:var(--r-sm);padding:14px 16px;
+  margin-bottom:14px;font-size:13px;line-height:1.7;
+  border-left:4px solid var(--pink);background:var(--pink-pale);
+}
+.detail-panel.is-safe  {border-left-color:var(--safe-color);background:var(--safe-bg);}
+.detail-panel.is-fertile{border-left-color:var(--pink);background:var(--fertile-bg);}
+.detail-panel.is-ovulation{border-left-color:var(--ovul-color);background:var(--ovul-bg);}
+.detail-panel.is-period{border-left-color:var(--pink-light);background:var(--period-bg);}
+.detail-panel.is-bbt   {border-left-color:var(--purple);background:var(--purple-bg);}
+
+/* ─────────────────────────────────────────────
+   BBT chart & list
+───────────────────────────────────────────── */
+.bbt-analysis{
+  border-radius:var(--r-sm);padding:12px 14px;
+  font-size:13px;line-height:1.7;margin-bottom:12px;
+  border-left:4px solid var(--purple);background:var(--purple-bg);
+}
+.bbt-analysis.confirmed{background:var(--safe-bg);border-left-color:var(--safe-color);}
+.bbt-analysis.warning  {background:#fff8e1;border-left-color:var(--ovul-color);}
+.bbt-chart-wrap{margin-bottom:14px;}
+.bbt-chart-title{
+  font-size:13px;font-weight:700;color:var(--text-sub);
+  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+}
+#bbtCanvas{width:100%;display:block;border-radius:6px;}
+.bbt-tip{
+  background:#fff8e1;border-radius:var(--r-sm);
+  padding:12px 14px;font-size:12px;color:#7a5800;
+  line-height:1.7;margin-bottom:14px;
+}
+.bbt-list{list-style:none;padding:0;margin:0;}
+.bbt-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.bbt-item:last-child{border-bottom:none;}
+.bbt-item .d{font-weight:700;}
+.bbt-item .ph{font-size:11px;color:var(--text-sub);margin-top:1px;}
+.bbt-item .tv{font-size:16px;font-weight:800;}
+.bbt-item.low  .tv{color:#2980b9;}
+.bbt-item.high .tv{color:#e74c3c;}
+.bbt-item.ovd  {background:#f3e5f5;}
+.bbt-item.ovd  .tv{color:var(--purple);}
+.empty-state{
+  text-align:center;color:var(--text-sub);
+  padding:36px 0;font-size:14px;
+}
+
+/* ─────────────────────────────────────────────
+   History tab
+───────────────────────────────────────────── */
+.hist-stats{
+  background:var(--white);border-radius:var(--r-sm);
+  box-shadow:var(--shadow-sm);padding:13px 16px;
+  margin-bottom:10px;font-size:13px;line-height:1.9;
+}
+.hist-advice{
+  background:var(--pink-pale);border-radius:var(--r-sm);
+  padding:11px 14px;font-size:13px;line-height:1.7;
+  margin-bottom:14px;
+}
+.hist-list{list-style:none;padding:0;margin:0;}
+.hist-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.hist-item:last-child{border-bottom:none;}
+.hist-item .hd{font-weight:700;color:var(--pink);}
+.hist-item .hc{font-size:12px;color:var(--text-sub);margin-top:2px;}
+
+/* ─────────────────────────────────────────────
+   Emergency tab
+───────────────────────────────────────────── */
+.emrg-box{
+  background:var(--white);border-radius:var(--r);
+  box-shadow:var(--shadow-sm);padding:16px;
+  margin-bottom:12px;border-left:4px solid var(--pink);
+}
+.emrg-box.warn  {border-left-color:var(--ovul-color);}
+.emrg-box.safe  {border-left-color:var(--safe-color);}
+.emrg-box.purple{border-left-color:var(--purple);}
+.emrg-box.pink2 {border-left-color:#fd79a8;}
+.emrg-title{font-size:14px;font-weight:800;margin-bottom:10px;}
+.emrg-box p{font-size:13px;color:#555;line-height:1.7;margin-bottom:7px;}
+.emrg-box p:last-child{margin-bottom:0;}
+.three-signal{
+  background:rgba(124,92,191,.08);border-radius:8px;
+  padding:10px 12px;font-size:12px;line-height:1.7;
+  color:#4a3a80;margin-top:8px;
+}
+.disclaimer-box{
+  background:var(--pink-pale);border-radius:var(--r-sm);
+  padding:12px 14px;font-size:12px;color:#b00020;
+  line-height:1.6;margin-bottom:14px;
+}
+
+/* ─────────────────────────────────────────────
+   Settings sheet  (bottom sheet / dialog)
+───────────────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);
+  z-index:500;display:none;align-items:flex-end;
+  justify-content:center;
+}
+.overlay.open{display:flex;}
+.sheet{
+  background:var(--white);border-radius:24px 24px 0 0;
+  width:100%;max-width:560px;
+  padding:20px 20px calc(env(safe-area-inset-bottom)+24px);
+  max-height:92vh;overflow-y:auto;
+  animation:slideUp .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{
+  width:40px;height:4px;background:var(--border);
+  border-radius:2px;margin:0 auto 18px;
+}
+.sheet-title{font-size:17px;font-weight:800;text-align:center;margin-bottom:18px;}
+.form-group{margin-bottom:14px;}
+.hist-hint{
+  background:var(--pink-pale);border-radius:var(--r-sm);
+  padding:10px 14px;font-size:12px;line-height:1.6;
+  margin-bottom:14px;
+}
+
+/* ─────────────────────────────────────────────
+   Page header row
+───────────────────────────────────────────── */
+.page-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.page-hd-title{font-size:19px;font-weight:800;}
+.setup-btn{
+  padding:7px 16px;background:var(--pink-pale);
+  color:var(--pink);border:none;border-radius:20px;
+  font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.setup-btn:hover{background:#fce0e4;}
+
+/* ─────────────────────────────────────────────
+   Desktop  ≥ 768px
+───────────────────────────────────────────── */
+@media(min-width:768px){
+  body{background:#f5eef0;}
+  .desk-header{display:flex;}
+  .bottom-nav{display:none;}
+  .app-body{
+    max-width:1100px;
+    padding:24px 28px 28px;
+  }
+  /* Calendar page: two-column */
+  .cal-desktop{
+    display:grid;
+    grid-template-columns:1fr 300px;
+    gap:18px;align-items:start;
+  }
+  .status-cards{grid-template-columns:1fr;}
+  /* Sheet → centered dialog */
+  .overlay{align-items:center;}
+  .sheet{border-radius:24px;max-width:480px;max-height:80vh;}
+}
+@media(max-width:380px){
+  .status-cards{grid-template-columns:repeat(3,1fr);}
+  .sc-value{font-size:12px;}
+  .cal-cell{font-size:11px;}
+}
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════
+     Desktop header
+════════════════════════════ -->
+<header class="desk-header">
+  <div class="desk-logo">
+    <div class="desk-logo-icon">🩺</div>
+    週期體溫避孕計算器
+  </div>
+  <nav class="desk-tabs">
+    <button class="desk-tab active" onclick="gotoPage('calendar',this)">預測日曆</button>
+    <button class="desk-tab"        onclick="gotoPage('bbt',this)">基礎體溫</button>
+    <button class="desk-tab"        onclick="gotoPage('history',this)">週期記錄</button>
+    <button class="desk-tab"        onclick="gotoPage('emergency',this)">緊急措施</button>
+  </nav>
+</header>
+
+<!-- ════════════════════════════
+     Main body
+════════════════════════════ -->
+<main class="app-body">
+
+  <!-- ══ PAGE: calendar ══ -->
+  <div id="page-calendar" class="page active">
+    <div class="cal-desktop">
+
+      <!-- LEFT: calendar -->
+      <div>
+        <div class="page-hd">
+          <div class="page-hd-title">週期日曆</div>
+          <button class="setup-btn" onclick="openSheet()">⚙ 設定週期</button>
+        </div>
+
+        <!-- Today STM status -->
+        <div id="stmCard" class="stm-card grey">
+          <div class="stm-hd">
+            <span class="stm-emoji" id="stmEmoji">📅</span>
+            <span class="stm-title" id="stmTitle">請點選「設定週期」開始計算</span>
+          </div>
+          <div class="stm-rows" id="stmRows"></div>
+        </div>
+
+        <!-- Calendar card -->
+        <div class="card" style="padding:18px 14px 14px;">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="moveMonth(-1)">‹</button>
+            <div class="cal-month" id="calMonthTitle">—</div>
+            <button class="cal-nav-btn" onclick="moveMonth(1)">›</button>
+          </div>
+          <div class="cal-wds">
+            <div class="cal-wd">日</div><div class="cal-wd">一</div>
+            <div class="cal-wd">二</div><div class="cal-wd">三</div>
+            <div class="cal-wd">四</div><div class="cal-wd">五</div>
+            <div class="cal-wd">六</div>
+          </div>
+          <div id="calGrid" class="cal-grid"></div>
+          <div class="legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--period-bg);border:1.5px solid var(--pink-light)"></div>月經期</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--fertile-bg);border:1.5px solid var(--pink)"></div>受孕期</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--ovul-color)"></div>排卵日</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--safe-bg);border:1.5px solid var(--safe-color)"></div>安全期</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>BBT確認</div>
+          </div>
+        </div>
+
+        <!-- Day detail -->
+        <div id="detailPanel" class="detail-panel hidden"></div>
+
+        <!-- Save cycle button -->
+        <button class="btn-outline hidden" id="saveCycleBtn" onclick="saveCurrentCycle()">💾 儲存此週期記錄</button>
+      </div>
+
+      <!-- RIGHT: status cards -->
+      <div>
+        <!-- 3 status cards -->
+        <div class="status-cards" id="statusCards">
+          <div class="status-card ov">
+            <div class="sc-icon">🔮</div>
+            <div class="sc-label">排卵日預測</div>
+            <div class="sc-value" id="scOvulation">—</div>
+            <div class="sc-sub"  id="scOvulationSub">請先計算</div>
+          </div>
+          <div class="status-card fer">
+            <div class="sc-icon">🔥</div>
+            <div class="sc-label">受孕期</div>
+            <div class="sc-value" id="scFertile">—</div>
+            <div class="sc-sub"  id="scFertileSub">受孕機率較高</div>
+          </div>
+          <div class="status-card saf">
+            <div class="sc-icon">🛡</div>
+            <div class="sc-label">安全期</div>
+            <div class="sc-value" id="scSafe">—</div>
+            <div class="sc-sub"  id="scSafeSub">受孕機率較低</div>
+          </div>
+        </div>
+
+        <!-- BBT summary -->
+        <div class="card-sm" style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:28px;">🌡️</div>
+          <div>
+            <div class="sc-label">BBT 體溫確認</div>
+            <div style="font-size:15px;font-weight:800;color:var(--purple);" id="scBBT">未記錄</div>
+            <div class="sc-sub" id="scBBTSub">前往「基礎體溫」頁記錄</div>
+          </div>
+        </div>
+
+        <!-- Next period -->
+        <div class="card-sm" style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:28px;">📅</div>
+          <div>
+            <div class="sc-label">下次月經預測</div>
+            <div style="font-size:15px;font-weight:800;color:var(--pink);" id="scNextPeriod">—</div>
+            <div class="sc-sub" id="scNextPeriodSub">設定週期後顯示</div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-box">
+          ⚠️ <b>STM 正確使用失敗率 0.4–2%，典型使用 1–3%。</b>壓力、熬夜、生病均可能使排卵偏移。若完全不想懷孕，<b>請搭配口服避孕藥、保險套或 IUD</b>。本工具不構成醫療建議。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: bbt ══ -->
+  <div id="page-bbt" class="page">
+    <div class="section-title"><span>🌡️</span>基礎體溫 BBT</div>
+
+    <div class="card" style="padding:16px;">
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div style="flex:1;">
+          <label class="field-label" for="bbtDate">日期</label>
+          <input class="field-input" type="date" id="bbtDate">
+        </div>
+        <div style="flex:1;">
+          <label class="field-label" for="bbtTemp">體溫（°C）</label>
+          <input class="field-input" type="number" id="bbtTemp" step="0.01" min="35" max="38.5" placeholder="36.50">
+        </div>
+        <div>
+          <button class="btn-primary" style="padding:10px 18px;width:auto;font-size:13px;" onclick="addBBT()">記錄</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="bbtAnalysis" class="bbt-analysis hidden"></div>
+
+    <div class="card hidden" id="bbtChartCard">
+      <div class="bbt-chart-title">📈 體溫走勢（最近 30 天）</div>
+      <canvas id="bbtCanvas" height="160"></canvas>
+    </div>
+
+    <div class="bbt-tip">
+      <b>如何解讀：</b>排卵前為低溫期（約 36.2–36.4°C），排卵後黃體素升高，體溫持續升高 0.3–0.5°C 並維持約 14 天。<b>連續 3 天以上穩定高溫</b>，即可確認排卵已完成，進入安全期。
+    </div>
+
+    <div class="card" id="bbtListCard" style="padding:0;overflow:hidden;">
+      <ul class="bbt-list" id="bbtList"></ul>
+    </div>
+    <div id="bbtEmpty" class="empty-state">尚無體溫記錄，請開始記錄</div>
+    <button class="btn-outline hidden" id="bbtClearBtn" style="margin-top:8px;" onclick="clearBBT()">清除所有體溫記錄</button>
+  </div>
+
+  <!-- ══ PAGE: history ══ -->
+  <div id="page-history" class="page">
+    <div class="section-title"><span>📋</span>週期記錄</div>
+
+    <div class="card" style="padding:16px;">
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="hDate">月經開始日</label>
+          <input class="field-input" type="date" id="hDate">
+        </div>
+        <div>
+          <label class="field-label" for="hCycle">週期長度（天）</label>
+          <input class="field-input" type="number" id="hCycle" value="28" min="18" max="60">
+        </div>
+      </div>
+      <button class="btn-primary" style="margin-top:12px;" onclick="addHistory()">新增記錄</button>
+    </div>
+
+    <div id="histStats"  class="hist-stats  hidden"></div>
+    <div id="histAdvice" class="hist-advice hidden"></div>
+
+    <div class="card" id="histListCard" style="padding:0;overflow:hidden;">
+      <ul class="hist-list" id="histList"></ul>
+    </div>
+    <div id="histEmpty" class="empty-state">尚無記錄，請新增月經開始日期</div>
+  </div>
+
+  <!-- ══ PAGE: emergency ══ -->
+  <div id="page-emergency" class="page">
+    <div class="section-title"><span>🚨</span>緊急措施與參考</div>
+
+    <div class="emrg-box">
+      <div class="emrg-title">🚨 緊急避孕藥（事後藥）</div>
+      <p><b>事後 72 小時內</b>服用效果最佳；部分藥品可延長至 120 小時，但越早越好。</p>
+      <p>• <b>左炔諾孕酮</b>（如後安錠）：藥局可直接購買，72 小時內約 89% 效果。<br>&nbsp;&nbsp;⚠️ <b>體重超過 75 公斤者效果降低</b>，建議改用 Ella 或銅製 IUD。</p>
+      <p>• <b>Ella</b>（烏利司他醋酸酯）：需處方，120 小時內效果優於左炔諾孕酮。<br>&nbsp;&nbsp;⚠️ <b>體重超過 95 公斤者</b>，銅製 IUD 是最可靠選項。</p>
+      <p>• <b>銅製 IUD：</b>置入後 5 天內效果高達 99.9%，不受體重影響，可同時作為長效避孕。</p>
+      <p>⚠️ 緊急避孕藥<b>非常規避孕手段</b>，荷爾蒙負擔較大，一個月內請勿超過一次。</p>
+    </div>
+
+    <div class="emrg-box warn">
+      <div class="emrg-title">🤰 懷孕自測時機</div>
+      <p>• <b>無套行為後第 14 天</b>：可驗出初步結果。</p>
+      <p>• <b>無套行為後第 21 天</b>：準確率大幅提升，幾乎可確認結果。</p>
+      <p>• <b>下次月經該來卻沒來時</b>：立即驗孕，此時最準確。</p>
+      <p style="font-size:12px;color:#888;margin-top:6px;">清晨第一泡尿濃度最高，準確率最佳。若已確認懷孕，請盡快諮詢婦產科醫師。</p>
+    </div>
+
+    <div class="emrg-box safe">
+      <div class="emrg-title">✅ 事前長期避孕選項</div>
+      <p>• <b>低劑量口服避孕藥（OCP）：</b>每天固定時間服用，排卵抑制率 &gt;99%。需婦科處方。</p>
+      <p>• <b>子宮內避孕器（IUD）：</b>含銅或含藥，有效期 3–10 年。</p>
+      <p>• <b>避孕貼片：</b>每週換一次，不需每天記得。</p>
+      <p>• <b>避孕針（Depo-Provera）：</b>每三個月注射一次。</p>
+      <p>• <b>皮下避孕棒（Implant）：</b>置入手臂，有效期 3 年，效果 &gt;99%。</p>
+    </div>
+
+    <div class="emrg-box purple">
+      <div class="emrg-title">🔬 症狀體溫法三信號</div>
+      <p>• <b>排卵試紙（LH試紙）—</b> 陽性代表 24–36 小時內即將排卵，受孕危險期開始。</p>
+      <p>• <b>基礎體溫（BBT）—</b> 連續 3 天高溫確認排卵已完成，危險期結束。</p>
+      <p>• <b>宮頸黏液 —</b> 透明拉絲如蛋白 = 排卵高峰；乾燥濃稠 = 雙重確認安全。</p>
+      <div class="three-signal">
+        <b>三信號邏輯：</b><br>
+        試紙陽性 → 危險期開始 → 禁止無套中出<br>
+        BBT 連續 3 天高溫 → 危險期結束 → 相對安全<br>
+        結合三信號，STM 準確率可接近 <b>99%</b>（需每天正確使用）
+      </div>
+    </div>
+
+    <div class="emrg-box pink2">
+      <div class="emrg-title">💊 給享受無套的人的建議</div>
+      <p>如果真的享受完全無套，由女生去婦產科諮詢<b>低劑量口服避孕藥</b>，每天固定吃一顆，就能達到 99% 以上避孕效果，做愛時完全不需要算日子。</p>
+      <p>如果男生願意負責，也可考慮<b>輸精管結紮</b>（微創，可逆性高，對身體幾乎無影響）。</p>
+    </div>
+
+    <div class="disclaimer-box">
+      本頁所有資訊僅供教育用途參考，不構成醫療建議。任何避孕或醫療決定請諮詢持照婦產科醫師或藥師。
+    </div>
+  </div>
+
+</main>
+
+<!-- ════════════════════════════
+     Bottom nav  (mobile)
+════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-calendar"  onclick="gotoPage('calendar',this)">
+    <div class="nav-icon">📅</div>日曆
+  </button>
+  <button class="nav-btn"        id="nav-bbt"       onclick="gotoPage('bbt',this)">
+    <div class="nav-icon">🌡️</div>體溫
+  </button>
+  <button class="nav-btn"        id="nav-history"   onclick="gotoPage('history',this)">
+    <div class="nav-icon">📋</div>記錄
+  </button>
+  <button class="nav-btn"        id="nav-emergency" onclick="gotoPage('emergency',this)">
+    <div class="nav-icon">🚨</div>緊急
+  </button>
+</nav>
+
+<!-- ════════════════════════════
+     Settings sheet
+════════════════════════════ -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙ 設定週期參數</div>
+
+    <div id="sheetHint" class="hist-hint hidden">
+      📊 已偵測到你的週期記錄，已自動填入參數。
+      <br><button class="btn-sm-green" onclick="autoFill()">重新從記錄自動填入</button>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">週期類型</label>
+      <div class="radio-group">
+        <label class="radio-pill on" id="rp-regular"   onclick="setCycleType('regular')">
+          <input type="radio" name="ctype" value="regular" checked>規律週期
+        </label>
+        <label class="radio-pill"    id="rp-irregular" onclick="setCycleType('irregular')">
+          <input type="radio" name="ctype" value="irregular">不規律週期
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="lastPeriod">上次月經第一天</label>
+      <input class="field-input" type="date" id="lastPeriod">
+    </div>
+
+    <div id="inp-regular" class="form-group">
+      <label class="field-label" for="cycleLength">平均週期長度（天）</label>
+      <input class="field-input" type="number" id="cycleLength" value="28" min="20" max="45">
+    </div>
+
+    <div id="inp-irregular" class="form-group hidden">
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="minLength">最短週期（天）</label>
+          <input class="field-input" type="number" id="minLength" value="25" min="18" max="45">
+        </div>
+        <div>
+          <label class="field-label" for="maxLength">最長週期（天）</label>
+          <input class="field-input" type="number" id="maxLength" value="32" min="20" max="50">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="periodLength">月經持續天數</label>
+      <input class="field-input" type="number" id="periodLength" value="5" min="2" max="10">
+    </div>
+
+    <button class="btn-primary" onclick="calcAndClose()">計算預測日曆</button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   State
+════════════════════════════════════════ */
+let cycleType  = 'regular';
+let calcParams = null;
+let dayMap     = {};        // isoDate → { dayNum, status, isOvDay, isBBTOv, isBBTHigh, bbtTemp, desc, isToday }
+let calYear, calMonth;
+
+/* ════════════════════════════════════════
+   Init
+════════════════════════════════════════ */
+(function(){
+  const t = new Date();
+  document.getElementById('lastPeriod').valueAsDate = t;
+  document.getElementById('hDate').valueAsDate      = t;
+  document.getElementById('bbtDate').valueAsDate    = t;
+  calYear  = t.getFullYear();
+  calMonth = t.getMonth();
+  renderCal();
+  renderHistory();
+  renderBBT();
+  checkHint();
+})();
+
+/* ════════════════════════════════════════
+   Navigation
+════════════════════════════════════════ */
+function gotoPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+name);
+  if(nb) nb.classList.add('active');
+
+  document.querySelectorAll('.desk-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+
+  if(name==='bbt') renderBBT();
+}
+
+/* ════════════════════════════════════════
+   Sheet
+════════════════════════════════════════ */
+function openSheet(){ checkHint(); document.getElementById('overlay').classList.add('open'); }
+function closeSheet(){ document.getElementById('overlay').classList.remove('open'); }
+function overlayClick(e){ if(e.target===document.getElementById('overlay')) closeSheet(); }
+function calcAndClose(){ calculate(); closeSheet(); }
+
+/* ════════════════════════════════════════
+   Cycle type
+════════════════════════════════════════ */
+function setCycleType(t){
+  cycleType = t;
+  document.getElementById('inp-regular').classList.toggle('hidden', t!=='regular');
+  document.getElementById('inp-irregular').classList.toggle('hidden', t!=='irregular');
+  document.getElementById('rp-regular').classList.toggle('on', t==='regular');
+  document.getElementById('rp-irregular').classList.toggle('on', t==='irregular');
+  document.querySelector('[name=ctype][value="'+t+'"]').checked=true;
+}
+
+/* ════════════════════════════════════════
+   History hint / auto-fill
+════════════════════════════════════════ */
+function checkHint(){
+  const h = getHistory();
+  const el = document.getElementById('sheetHint');
+  if(h.length>=2){ el.classList.remove('hidden'); autoFill(); }
+  else el.classList.add('hidden');
+}
+function autoFill(){
+  const h = getHistory(); if(!h.length) return;
+  document.getElementById('lastPeriod').value = h[0].date;
+  if(h.length>=2){
+    const cs = h.map(x=>x.cycle);
+    const mn = Math.min(...cs), mx = Math.max(...cs);
+    const av = Math.round(cs.reduce((a,b)=>a+b,0)/cs.length);
+    if(mn===mx){ setCycleType('regular'); document.getElementById('cycleLength').value=av; }
+    else{ setCycleType('irregular'); document.getElementById('minLength').value=mn; document.getElementById('maxLength').value=mx; }
+  }
+}
+
+/* ════════════════════════════════════════
+   BBT analysis
+════════════════════════════════════════ */
+function analyzeBBT(data){
+  if(data.length<6) return null;
+  const sorted = [...data].sort((a,b)=>a.date.localeCompare(b.date));
+  const temps  = sorted.map(d=>d.temp);
+  const bot6   = [...temps].sort((a,b)=>a-b).slice(0,Math.min(6,temps.length));
+  const cl     = +(Math.max(...bot6)+0.05).toFixed(2);
+  let hi = -1;
+  for(let i=0;i<=sorted.length-3;i++){
+    if(sorted[i].temp>=cl&&sorted[i+1].temp>=cl&&sorted[i+2].temp>=cl){ hi=i; break; }
+  }
+  if(hi===-1) return {coverLine:cl,ovulationDate:null,highTempStartDate:null,consecutiveHighDays:0,sorted};
+  const hiDate = sorted[hi].date;
+  const ovDate = sorted[hi>0?hi-1:0].date;
+  let cons=0;
+  for(let i=hi;i<sorted.length;i++){ if(sorted[i].temp>=cl) cons++; else break; }
+  return {coverLine:cl,ovulationDate:ovDate,highTempStartDate:hiDate,consecutiveHighDays:cons,sorted};
+}
+
+/* ════════════════════════════════════════
+   Main calculate
+════════════════════════════════════════ */
+function calculate(){
+  const lpv = document.getElementById('lastPeriod').value;
+  if(!lpv) return alert('請選擇上次月經第一天');
+
+  const start = new Date(lpv+'T00:00:00');
+  const pd    = Math.max(2,Math.min(10, parseInt(document.getElementById('periodLength').value)||5));
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let ovDay, startD, endD, total, cLen;
+  if(cycleType==='regular'){
+    cLen   = parseInt(document.getElementById('cycleLength').value)||28;
+    ovDay  = cLen-14;
+    startD = ovDay-5; endD = ovDay+2; total = cLen;
+  } else {
+    const mn = parseInt(document.getElementById('minLength').value)||25;
+    const mx = parseInt(document.getElementById('maxLength').value)||32;
+    if(mn>=mx) return alert('最短週期必須小於最長週期');
+    ovDay=null; startD=mn-18; endD=mx-11; cLen=mx; total=mx;
+  }
+  total = Math.max(total,28);
+  calcParams = {lpv, cLen:cLen||28, pd};
+
+  const bbtRaw = getBBT();
+  const bbtRes = analyzeBBT(bbtRaw);
+  const bbtMap = {}; bbtRaw.forEach(b=>{ bbtMap[b.date]=b.temp; });
+  const bbtOvD  = bbtRes?.ovulationDate||null;
+  const bbtHiD  = bbtRes?.highTempStartDate||null;
+  const bbtCL   = bbtRes?.coverLine||null;
+
+  dayMap = {};
+  let todayInfo = null;
+
+  for(let i=1;i<=total;i++){
+    const d = new Date(start); d.setDate(start.getDate()+i-1);
+    const iso = d.toISOString().slice(0,10);
+    const bt  = bbtMap[iso];
+    const isBBTOv = iso===bbtOvD;
+    const isBBTHi = !!(bbtHiD&&iso>=bbtHiD&&bt!=null&&bbtRes&&bt>=bbtCL);
+    const isTd    = d.getTime()===today.getTime();
+
+    let st='safe', isOv=false;
+    if(i<=pd){ st='period'; }
+    else if(ovDay&&i===ovDay){ st='ovulation'; isOv=true; }
+    else if(i>=startD&&i<=endD){ st='fertile'; }
+
+    const desc = buildDesc(i,st,isOv,pd,ovDay,startD,endD,bt,bbtCL,isBBTOv);
+    dayMap[iso] = {dayNum:i,status:st,isOvDay:isOv,isBBTOv,isBBTHi,bbtTemp:bt,desc,isToday:isTd};
+    if(isTd) todayInfo = dayMap[iso];
+  }
+
+  // Summary cards
+  const ovDate  = ovDay ? dOff(start,ovDay-1) : null;
+  const nextP   = dOff(start,cLen);
+  const daysLeft = Math.round((nextP-today)/86400000);
+
+  document.getElementById('scOvulation').textContent   = ovDate ? fmt(ovDate) : `第${startD}–${endD}天`;
+  document.getElementById('scOvulationSub').textContent= ovDate ? '今日為排卵日，受孕機率最高' : '不規律模式';
+  document.getElementById('scFertile').textContent     = ovDay ? `${fmt(dOff(start,startD-1))}–${fmt(dOff(start,endD-1))}` : `第${startD}–${endD}天`;
+  document.getElementById('scFertileSub').textContent  = '受孕機率較高，請多加留意';
+  document.getElementById('scSafe').textContent        = fmt(dOff(start,endD)) + ' 起';
+  document.getElementById('scSafeSub').textContent     = '進入安全期，受孕機率較低';
+  document.getElementById('scNextPeriod').textContent  = fmt(nextP);
+  document.getElementById('scNextPeriodSub').textContent = `距離預測日：${daysLeft} 天`;
+
+  if(bbtRes?.ovulationDate){
+    const od = new Date(bbtRes.ovulationDate+'T00:00:00');
+    document.getElementById('scBBT').textContent    = `${od.getMonth()+1}/${od.getDate()} 確認`;
+    document.getElementById('scBBTSub').textContent = `連續高溫 ${bbtRes.consecutiveHighDays} 天`;
+  } else if(bbtRaw.length>0){
+    document.getElementById('scBBT').textContent    = '記錄中…';
+    document.getElementById('scBBTSub').textContent = `已記錄 ${bbtRaw.length} 筆`;
+  } else {
+    document.getElementById('scBBT').textContent    = '未記錄';
+    document.getElementById('scBBTSub').textContent = '前往「基礎體溫」頁記錄';
+  }
+
+  buildSTM(todayInfo, bbtRes);
+  document.getElementById('saveCycleBtn').classList.remove('hidden');
+  renderCal();
+  document.getElementById('detailPanel').classList.add('hidden');
+}
+
+function buildDesc(i,st,isOv,pd,ovDay,startD,endD,bt,cl,isBBTOv){
+  let d='';
+  if(st==='period') d=`<b>月經期（第${i}天）：</b>經血排出中，月經尾聲仍有極低風險，請注意衛生。`;
+  else if(st==='ovulation') d=`<b>預測排卵日（第${i}天）：</b>卵子排出後可存活約 24 小時，加上精子可活 3–5 天，懷孕機率最高。`;
+  else if(st==='fertile'){
+    const pre = ovDay?i<ovDay:true;
+    d = pre
+      ? `<b>排卵前受孕期（第${i}天）：</b>精子可存活 3–5 天等待卵子，此時中出仍有受孕風險。分泌物逐漸濕滑透明。`
+      : `<b>排卵後受孕期（第${i}天）：</b>卵子剛排出，仍可存活最多 24–48 小時。體溫開始升高，分泌物逐漸減少。`;
+  } else {
+    const after = ovDay?i>ovDay+2:false;
+    d = after
+      ? `<b>排卵後安全期（第${i}天）：</b>卵子已凋謝，受孕機率極低。若 BBT 已連續 3 天穩定高溫，安全性更有保障。`
+      : `<b>排卵前安全期（第${i}天）：</b>距離排卵尚有一段時間，受孕機率低。但若週期突然縮短，危險期可能提早。`;
+  }
+  if(bt!=null){
+    const ph = cl?(bt>=cl?'<span style="color:#e74c3c">高溫期↑</span>':'<span style="color:#2980b9">低溫期↓</span>'):'';
+    d+=`<br><b>今日 BBT：</b>${bt.toFixed(2)}°C ${ph}`;
+  }
+  if(isBBTOv) d+=`<br><span style="color:var(--purple);font-weight:700;">🌡️ BBT 確認此日為排卵日</span>`;
+  return d;
+}
+
+/* ════════════════════════════════════════
+   STM Banner
+════════════════════════════════════════ */
+function buildSTM(todayInfo, bbtRes){
+  const card  = document.getElementById('stmCard');
+  const emoji = document.getElementById('stmEmoji');
+  const title = document.getElementById('stmTitle');
+  const rows  = document.getElementById('stmRows');
+  card.className='stm-card'; rows.innerHTML='';
+
+  if(!todayInfo){
+    card.classList.add('grey'); emoji.textContent='📅';
+    title.textContent='今天不在本週期計算範圍內'; return;
+  }
+  const {status,isOvDay,isBBTOv,isBBTHi,bbtTemp}=todayInfo;
+
+  let c1p,c1i,c1t;
+  if(status==='period'){ c1p=false;c1i='🩸';c1t='<b>公式：</b>今天是月經期'; }
+  else if(status==='fertile'||status==='ovulation'){ c1p=false;c1i='🔴';c1t=`<b>公式：</b>${isOvDay?'今天是預測排卵日':'今天在受孕期範圍內'}`; }
+  else { c1p=true;c1i='🟢';c1t='<b>公式：</b>今天是安全期（日曆計算）'; }
+
+  let c2p,c2i,c2t;
+  const cH = bbtRes?.consecutiveHighDays||0;
+  if(!bbtRes||bbtRes.highTempStartDate===null){ c2p=null;c2i='⚪';c2t='<b>BBT：</b>尚無足夠記錄（需先記錄體溫）'; }
+  else if(cH>=3){ c2p=true;c2i='🟢';c2t=`<b>BBT：</b>體溫已連續 ${cH} 天高溫 ✓ 排卵已確認`; }
+  else { c2p=false;c2i='🔴';c2t=`<b>BBT：</b>尚未達「連續 3 天高溫」（目前 ${cH} 天）`; }
+
+  let cls,em,tt;
+  if(status==='period'){ cls='yellow';em='🩸';tt='月經期 — 請注意衛生風險'; }
+  else if(c1p===false||c2p===false){
+    cls='red';em='🔴';
+    if(!c1p&&(!c2p||c2p===null)) tt='紅燈：受孕期 ＋ BBT 未確認 — 切勿無套中出！';
+    else if(!c1p) tt='紅燈：公式判斷為受孕期 — 切勿無套中出！';
+    else tt='紅燈：公式安全，但 BBT 未達高溫確認 — 建議戴套';
+  } else if(c1p&&c2p===true){ cls='green';em='🟢';tt='綠燈：公式安全 ＋ BBT 連續高溫確認 — 相對安全'; }
+  else { cls='yellow';em='⚠️';tt='黃燈：公式安全，但缺乏 BBT 確認 — 建議記錄體溫'; }
+
+  card.classList.add(cls); emoji.textContent=em; title.textContent=tt;
+
+  [[c1i,c1t],[c2i,c2t],['💧','<b>分泌物：</b>透明拉絲 = 危險；乾燥濃稠 = 較安全']].forEach(([ic,tx])=>{
+    const div=document.createElement('div'); div.className='stm-row';
+    div.innerHTML=`<span style="flex-shrink:0">${ic}</span><span>${tx}</span>`;
+    rows.appendChild(div);
+  });
+  if(bbtTemp!=null){
+    const div=document.createElement('div'); div.className='stm-row';
+    div.innerHTML=`<span style="flex-shrink:0">🌡️</span><span><b>今日體溫：</b>${bbtTemp.toFixed(2)}°C${bbtRes?.coverLine?` (分界線 ${bbtRes.coverLine}°C)`:''}</span>`;
+    rows.appendChild(div);
+  }
+}
+
+/* ════════════════════════════════════════
+   Calendar render
+════════════════════════════════════════ */
+function renderCal(){
+  const y=calYear, m=calMonth;
+  const mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('calMonthTitle').textContent=`${y}年${mn[m]}`;
+
+  const grid=document.getElementById('calGrid'); grid.innerHTML='';
+  const first=new Date(y,m,1), last=new Date(y,m+1,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+
+  // pad start
+  for(let i=0;i<first.getDay();i++){
+    const d=new Date(y,m,1-(first.getDay()-i));
+    const c=document.createElement('div');
+    c.className='cal-cell other'; c.textContent=d.getDate();
+    grid.appendChild(c);
+  }
+
+  for(let d=1;d<=last.getDate();d++){
+    const date=new Date(y,m,d);
+    const iso=date.toISOString().slice(0,10);
+    const info=dayMap[iso];
+    const isTd=date.getTime()===today.getTime();
+
+    const cell=document.createElement('div');
+    let cls='cal-cell';
+    if(info){
+      if(info.isBBTOv)        cls+=' bbt-ov';
+      else if(info.isBBTHi)   cls+=' bbt-hi';
+      else if(info.status==='period')    cls+=' period';
+      else if(info.status==='ovulation') cls+=' ovulation';
+      else if(info.status==='fertile')   cls+=' fertile';
+      else if(info.status==='safe')      cls+=' safe';
+    }
+    if(isTd) cls+=' today';
+    cell.className=cls;
+    cell.textContent=d;
+
+    if(info?.bbtTemp!=null){
+      const dot=document.createElement('div'); dot.className='cell-bbt-dot';
+      cell.appendChild(dot);
+    }
+    cell.onclick=()=>showDay(iso,cell);
+    grid.appendChild(cell);
+  }
+
+  // pad end
+  const rem=7-(first.getDay()+last.getDate())%7;
+  if(rem<7){ for(let i=1;i<=rem;i++){ const c=document.createElement('div');c.className='cal-cell other';c.textContent=i;grid.appendChild(c); } }
+}
+
+function moveMonth(d){
+  calMonth+=d;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCal();
+  document.getElementById('detailPanel').classList.add('hidden');
+}
+
+function showDay(iso,cell){
+  document.querySelectorAll('.cal-cell').forEach(c=>c.classList.remove('sel'));
+  cell.classList.add('sel');
+  const info=dayMap[iso];
+  const panel=document.getElementById('detailPanel');
+  if(!info){panel.classList.add('hidden');return;}
+  const dt=new Date(iso+'T00:00:00');
+  let cls='detail-panel';
+  if(info.isBBTOv||info.isBBTHi) cls+=' is-bbt';
+  else cls+=` is-${info.status}`;
+  panel.className=cls;
+  panel.innerHTML=`<strong>${dt.getMonth()+1}/${dt.getDate()}（第${info.dayNum}天）${info.isToday?' — 今天':''}</strong><br><span style="display:inline-block;margin-top:6px">${info.desc}</span>`;
+  panel.classList.remove('hidden');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ════════════════════════════════════════
+   Helpers
+════════════════════════════════════════ */
+function dOff(b,n){ const d=new Date(b);d.setDate(b.getDate()+n);return d; }
+function fmt(d){
+  const dow=['日','一','二','三','四','五','六'][d.getDay()];
+  return `${d.getMonth()+1}/${d.getDate()}（週${dow}）`;
+}
+
+/* ════════════════════════════════════════
+   History
+════════════════════════════════════════ */
+function getHistory(){ try{return JSON.parse(localStorage.getItem('periodHistory')||'[]');}catch{return[];} }
+function saveHistoryData(a){ localStorage.setItem('periodHistory',JSON.stringify(a)); }
+
+function addHistory(){
+  const date=document.getElementById('hDate').value;
+  const cycle=parseInt(document.getElementById('hCycle').value);
+  if(!date) return alert('請選擇日期');
+  if(!cycle||cycle<18||cycle>60) return alert('週期長度需在 18–60 天之間');
+  const h=getHistory();
+  if(h.find(x=>x.date===date)) return alert('此日期已有記錄');
+  h.push({date,cycle}); h.sort((a,b)=>b.date.localeCompare(a.date));
+  saveHistoryData(h); renderHistory(); checkHint();
+}
+function deleteHistory(date){
+  saveHistoryData(getHistory().filter(h=>h.date!==date));
+  renderHistory(); checkHint();
+}
+function renderHistory(){
+  const h=getHistory();
+  const list=document.getElementById('histList');
+  const empty=document.getElementById('histEmpty');
+  const stats=document.getElementById('histStats');
+  const advice=document.getElementById('histAdvice');
+  const card=document.getElementById('histListCard');
+  list.innerHTML='';
+  if(!h.length){ empty.classList.remove('hidden');card.classList.add('hidden');stats.classList.add('hidden');advice.classList.add('hidden');return; }
+  empty.classList.add('hidden');card.classList.remove('hidden');
+  if(h.length>=2){
+    const cs=h.map(x=>x.cycle);
+    const av=(cs.reduce((a,b)=>a+b,0)/cs.length).toFixed(1);
+    const mn=Math.min(...cs),mx=Math.max(...cs);
+    stats.innerHTML=`📊 共 <b>${h.length}</b> 筆記錄 &nbsp;|&nbsp; 平均週期：<b>${av}</b> 天<br>最短：<b>${mn}</b> 天 &nbsp;|&nbsp; 最長：<b>${mx}</b> 天${h.length>=3?` &nbsp;|&nbsp; 變動幅度：<b>${mx-mn}</b> 天`:''}`;
+    stats.classList.remove('hidden');
+    const sp=mx-mn;
+    const advText=sp<=2&&h.length>=3?`✅ 你的週期非常規律（變動 ${sp} 天），已自動使用「規律模式」。`:sp>=7?`⚠️ 你的週期變動較大（${sp} 天），已自動切換為「不規律模式」，危險期範圍更保守。<b>強烈建議搭配 BBT 記錄。</b>`:`ℹ️ 週期有輕微變動（${sp} 天），使用「不規律模式」較安全。`;
+    advice.innerHTML=advText; advice.classList.remove('hidden');
+  } else { stats.classList.add('hidden');advice.innerHTML='ℹ️ 繼續新增記錄，累積 3 個月後系統可自動分析週期規律性。';advice.classList.remove('hidden'); }
+  h.forEach(x=>{
+    const li=document.createElement('li'); li.className='hist-item';
+    li.innerHTML=`<div><div class="hd">${x.date}</div><div class="hc">週期 ${x.cycle} 天</div></div><button class="btn-del" onclick="deleteHistory('${x.date}')">✕</button>`;
+    list.appendChild(li);
+  });
+}
+function saveCurrentCycle(){
+  if(!calcParams) return alert('請先進行計算');
+  const {lpv,cLen}=calcParams;
+  const h=getHistory();
+  if(h.find(x=>x.date===lpv)) return alert('此週期已存在記錄中');
+  h.push({date:lpv,cycle:cLen}); h.sort((a,b)=>b.date.localeCompare(a.date));
+  saveHistoryData(h); renderHistory(); checkHint(); alert('已儲存至週期記錄！');
+}
+
+/* ════════════════════════════════════════
+   BBT
+════════════════════════════════════════ */
+function getBBT(){ try{return JSON.parse(localStorage.getItem('bbtData')||'[]');}catch{return[];} }
+function saveBBT(a){ localStorage.setItem('bbtData',JSON.stringify(a)); }
+function addBBT(){
+  const date=document.getElementById('bbtDate').value;
+  const temp=parseFloat(document.getElementById('bbtTemp').value);
+  if(!date) return alert('請選擇日期');
+  if(isNaN(temp)||temp<35||temp>38.5) return alert('體溫需在 35.0–38.5°C 之間');
+  const d=getBBT().filter(b=>b.date!==date);
+  d.push({date,temp}); d.sort((a,b)=>b.date.localeCompare(a.date));
+  saveBBT(d); renderBBT(); document.getElementById('bbtTemp').value='';
+}
+function deleteBBT(date){ saveBBT(getBBT().filter(b=>b.date!==date)); renderBBT(); }
+function clearBBT(){ if(!confirm('確定要清除所有體溫記錄？'))return; saveBBT([]); renderBBT(); }
+
+function renderBBT(){
+  const data=getBBT();
+  const list=document.getElementById('bbtList');
+  const empty=document.getElementById('bbtEmpty');
+  const clearBtn=document.getElementById('bbtClearBtn');
+  const analysis=document.getElementById('bbtAnalysis');
+  const chartCard=document.getElementById('bbtChartCard');
+  const listCard=document.getElementById('bbtListCard');
+  list.innerHTML='';
+  if(!data.length){ empty.classList.remove('hidden');listCard.classList.add('hidden');clearBtn.classList.add('hidden');analysis.classList.add('hidden');chartCard.classList.add('hidden');return; }
+  empty.classList.add('hidden'); listCard.classList.remove('hidden'); clearBtn.classList.remove('hidden');
+  const res=analyzeBBT(data);
+  if(res){
+    let cls='bbt-analysis',txt='';
+    if(res.ovulationDate){
+      const ch=res.consecutiveHighDays; cls+=ch>=3?' confirmed':' warning';
+      const od=new Date(res.ovulationDate+'T00:00:00');
+      txt+=`🌡️ <b>Cover Line（分界線）：${res.coverLine}°C</b><br>`;
+      txt+=`📅 <b>推算排卵日：${od.getMonth()+1}/${od.getDate()}</b>（體溫由低轉高的轉折點）<br>`;
+      txt+=ch>=3?`✅ <b>高溫期已連續 ${ch} 天確認</b> — 排卵已完成，進入安全期。`:`⏳ <b>高溫期目前僅 ${ch} 天</b>（需連續 3 天才能確認）。`;
+    } else { cls+=' warning'; txt=`⏳ 資料不足以識別體溫轉折點（Cover Line：${res.coverLine}°C）。<br>請繼續每天記錄。`; }
+    analysis.innerHTML=txt; analysis.className=cls; analysis.classList.remove('hidden');
+  } else { analysis.innerHTML='⏳ 資料不足（需至少 6 筆），請繼續記錄體溫。'; analysis.className='bbt-analysis warning'; analysis.classList.remove('hidden'); }
+  chartCard.classList.remove('hidden');
+  drawBBTChart(data,res);
+  const cl=res?.coverLine||null, ovD=res?.ovulationDate||null, hiD=res?.highTempStartDate||null;
+  [...data].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,30).forEach(b=>{
+    const isH=cl!=null&&b.temp>=cl, isL=cl!=null&&b.temp<cl, isO=b.date===ovD;
+    const li=document.createElement('li');
+    li.className=`bbt-item${isO?' ovd':isH?' high':isL?' low':''}`;
+    const ph=cl==null?'':isO?'排卵日':isH?'↑ 高溫期':'↓ 低溫期';
+    li.innerHTML=`<div><div class="d">${b.date}${isO?' 🌡️':''}</div><div class="ph">${ph}</div></div><div style="display:flex;align-items:center;gap:10px;"><div class="tv">${b.temp.toFixed(2)}°C</div><button class="btn-del" onclick="deleteBBT('${b.date}')">✕</button></div>`;
+    list.appendChild(li);
+  });
+}
+
+function drawBBTChart(data,result){
+  const canvas=document.getElementById('bbtCanvas');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-32, H=160;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const pts=[...data].sort((a,b)=>a.date.localeCompare(b.date)).slice(-30);
+  if(pts.length<2) return;
+  const temps=pts.map(p=>p.temp);
+  const minT=Math.min(...temps)-.1, maxT=Math.max(...temps)+.1;
+  const PAD={l:38,r:12,t:14,b:26};
+  const gW=W-PAD.l-PAD.r, gH=H-PAD.t-PAD.b;
+  const xOf=i=>PAD.l+(i/(pts.length-1))*gW;
+  const yOf=t=>PAD.t+gH-((t-minT)/(maxT-minT))*gH;
+
+  // Grid
+  ctx.strokeStyle='#f0e4e6'; ctx.lineWidth=0.5;
+  ctx.fillStyle='#9a8085'; ctx.font='10px system-ui'; ctx.textAlign='right';
+  for(let s=0;s<=4;s++){
+    const t=minT+(maxT-minT)*(s/4), y=yOf(t);
+    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
+    ctx.fillText(t.toFixed(2),PAD.l-4,y+3);
+  }
+  // Cover line
+  const cl=result?.coverLine;
+  if(cl&&cl>=minT&&cl<=maxT){
+    ctx.strokeStyle='#e8637a';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+    const cy=yOf(cl);
+    ctx.beginPath();ctx.moveTo(PAD.l,cy);ctx.lineTo(W-PAD.r,cy);ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle='#e8637a';ctx.textAlign='left';
+    ctx.fillText(`${cl}`,PAD.l+4,cy-3);
+  }
+  // Line
+  const hiD=result?.highTempStartDate;
+  ctx.strokeStyle='#3d5afe';ctx.lineWidth=2;ctx.setLineDash([]);ctx.beginPath();
+  pts.forEach((p,i)=>{
+    const x=xOf(i),y=yOf(p.temp);
+    const isH=hiD&&p.date>=hiD;
+    if(i===0){ctx.moveTo(x,y);}
+    else{
+      const ph=hiD&&pts[i-1].date>=hiD;
+      if(isH&&!ph){ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.strokeStyle='#e74c3c';ctx.moveTo(x,y);}
+      else ctx.lineTo(x,y);
+    }
+  });
+  ctx.stroke();
+  // Dots
+  pts.forEach((p,i)=>{
+    const x=xOf(i),y=yOf(p.temp);
+    const isO=p.date===result?.ovulationDate;
+    const isH=hiD&&p.date>=hiD;
+    ctx.beginPath();ctx.arc(x,y,isO?5:3,0,Math.PI*2);
+    ctx.fillStyle=isO?'#7c5cbf':isH?'#e74c3c':'#3d5afe';ctx.fill();
+  });
+  // X labels
+  ctx.fillStyle='#9a8085';ctx.font='9px system-ui';ctx.textAlign='center';
+  pts.forEach((p,i)=>{
+    if(i%Math.max(1,Math.floor(pts.length/6))===0||i===pts.length-1){
+      const d=new Date(p.date+'T00:00:00');
+      ctx.fillText(`${d.getMonth()+1}/${d.getDate()}`,xOf(i),H-PAD.b+14);
+    }
+  });
+}
+</script>
+</body>
+</html>
