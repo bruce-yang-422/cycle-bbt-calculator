@@ -7,66 +7,25 @@
     <meta name="description" content="找不到此頁面。返回週期體溫避孕計算器首頁。">
     <meta name="robots" content="noindex, follow">
     <link rel="canonical" href="https://cycle-bbt.stack-base.com/">
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #fff0f3 0%, #f8f9fa 100%);
-            color: #2f3542;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .container {
-            max-width: 480px;
-            width: 100%;
-            background: white;
-            padding: 48px 32px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(255,107,129,0.12);
-            text-align: center;
-        }
-        .code {
-            font-size: 80px;
-            font-weight: 900;
-            color: #ff6b81;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-        h1 {
-            font-size: 20px;
-            color: #2f3542;
-            margin-bottom: 12px;
-        }
-        p {
-            font-size: 14px;
-            color: #747d8c;
-            line-height: 1.7;
-            margin-bottom: 28px;
-        }
-        a {
-            display: inline-block;
-            padding: 12px 32px;
-            background: linear-gradient(135deg, #ff6b81, #ff4757);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-        a:hover { opacity: 0.9; }
-    </style>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="stylesheet" href="/css/not-found.css">
 </head>
 <body>
     <div class="container">
         <div class="code">404</div>
-        <h1>找不到此頁面</h1>
-        <p>你要找的頁面不存在，可能已被移除或網址有誤。</p>
-        <a href="index.html">返回首頁</a>
+        <h1 data-i18n="notFound.title">找不到此頁面</h1>
+        <p data-i18n="notFound.body">你要找的頁面不存在，可能已被移除或網址有誤。</p>
+        <a id="homeLink" href="/" data-i18n="notFound.home">返回首頁</a>
     </div>
+<script src="/locales/zh-TW.js"></script>
+<script src="/locales/en.js"></script>
+<script src="/locales/ja.js"></script>
+<script src="/locales/ko.js"></script>
+<script src="/locales/es.js"></script>
+<script src="/locales/de.js"></script>
+<script src="/locales/th.js"></script>
+<script src="/locales/vi.js"></script>
+<script src="/js/i18n.js"></script>
+<script src="/js/not-found.js"></script>
 </body>
 </html>
