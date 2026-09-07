@@ -1,7 +1,8 @@
 /* All languages are cached together, so switching also works offline. */
-const CACHE_NAME = 'cycle-bbt-v4-guide-1';
+const CACHE_NAME = 'cycle-bbt-v4-guide-6';
 const LANGUAGES = ['zh-TW', 'en', 'ja', 'ko', 'es', 'de', 'th', 'vi'];
 const PRECACHE_URLS = [
+  './locales/guide-emphasis.js',
   './404.html', './css/not-found.css', './js/not-found.js', './', './index.html', './manifest.json', './css/app.css',
   ...['i18n', 'cycle', 'storage', 'chart', 'pwa', 'purposes', 'app', 'events', 'region', 'share'].map(name => `./js/${name}.js`),
   ...LANGUAGES.flatMap(lang => [`./locales/${lang}.js`, `./locales/manifest.${lang}.json`]),

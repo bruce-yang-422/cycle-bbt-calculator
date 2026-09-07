@@ -40,6 +40,17 @@ const server=http.createServer((req,res)=>{
       assert.equal(await page.locator('html').getAttribute('lang'),lang);
       for(const mode of ['tracking','contraception','conception']){
         await page.locator('#audienceSelect').selectOption(mode);
+        const guide=await page.locator('#purposeGuide').innerText();
+        const emergency=await page.evaluate(()=>t('help.ecTitle'));
+        assert.equal(guide.includes(emergency),mode==='contraception',`${lang}/${mode} emergency guidance`);
+        const expectedTitle={tracking:'guide.trackingTitle',contraception:'guide.title',conception:'guide.conceptionTitle'}[mode];
+        assert.equal(await page.locator('#purposeGuideTitle').textContent(),await page.evaluate(key=>t(key),expectedTitle));
+        await page.locator('#purposeGuide details').evaluateAll(items=>items.forEach(item=>item.open=true));
+        assert(await page.locator('#purposeGuide strong.guide-emphasis').count()>0,`${lang}/${mode} emphasis`);
+        for(const item of await page.locator('#purposeGuide [data-topic]').all()){
+          const key=await item.getAttribute('data-topic');
+          assert.equal(await item.locator('p').textContent(),await page.evaluate(key=>t(key),key));
+        }
         for(const name of ['calendar','bbt','history','emergency']){
           await page.evaluate(n=>gotoPage(n),name);
           for(const width of [320,768,1440]){

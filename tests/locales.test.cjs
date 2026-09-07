@@ -8,6 +8,14 @@ const langs=['zh-TW','en','ja','ko','es','de','th','vi'];
 const ctx=vm.createContext({window:{}});
 for(const lang of langs)vm.runInContext(fs.readFileSync(path.join(root,'locales',lang+'.js'),'utf8'),ctx);
 const catalogs=ctx.window.CYCLE_LOCALES;
+test('guide emphasis matches actual translated copy in all eight languages',()=>{
+  vm.runInContext(fs.readFileSync(path.join(root,'locales/guide-emphasis.js'),'utf8'),ctx);
+  const emphasis=ctx.window.CYCLE_GUIDE_EMPHASIS;
+  assert.deepEqual(Object.keys(emphasis).sort(),[...langs].sort());
+  for(const lang of langs)for(const [key,phrases] of Object.entries(emphasis[lang])){
+    for(const phrase of phrases)assert(catalogs[lang][key].includes(phrase),`${lang}:${key}:${phrase}`);
+  }
+});
 test('eight complete catalogs with matching placeholders',()=>{
   const keys=Object.keys(catalogs.en).sort();
   for(const lang of langs){

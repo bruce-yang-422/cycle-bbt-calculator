@@ -277,8 +277,8 @@
   <div id="page-emergency" class="page">
     <div class="section-title" data-i18n="settings.title">設定與指南</div>
     <p class="page-intro" data-i18n="guide.subtitle"></p>
-    <h2 class="settings-help-title" data-i18n="settings.preferences">偏好設定</h2>
     <div class="settings-card">
+    <h2 class="settings-help-title" data-i18n="settings.preferences">偏好設定</h2>
     <div class="settings-preferences"><div class="audience-picker"><label for="languageSelect" data-i18n="language">語言</label><select class="audience-select language-select" id="languageSelect" data-control="control-7"><option value="zh-TW">繁體中文</option><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="de">Deutsch</option><option value="th">ไทย</option><option value="vi">Tiếng Việt</option></select></div>
       <div class="audience-picker"><label for="audienceSelect"><span data-i18n="purpose">使用目的</span></label><select class="audience-select" id="audienceSelect" data-control="control-8"><option value="tracking" data-i18n="mode.tracking">月經記錄</option><option value="contraception" selected data-i18n="mode.contraception">避孕規劃</option><option value="conception" data-i18n="mode.conception">備孕規劃</option></select></div>
     </div>
@@ -293,21 +293,16 @@
     </div>
     <div class="settings-privacy"><span class="privacy-badge"><span data-i18n="privacy">資料僅儲存於您的裝置</span></span></div>
     </div>
-    <h2 class="settings-help-title" data-i18n="guide.title">緊急措施與參考</h2>
+    <h2 class="settings-help-title" id="purposeGuideTitle">緊急措施與參考</h2>
     <p class="page-intro" id="helpIntro"></p>
+    <div id="purposeGuide"></div>
     <div id="taiwanHelp" class="emrg-box safe hidden">
       <div class="emrg-title" data-i18n="tw.title">在台灣尋求協助</div>
       <p id="taiwanPurpose"></p>
       <p data-i18n="tw.support"></p>
       <a href="https://www.immigration.gov.tw/5385/7445/7910/204893/" target="_blank" rel="noopener noreferrer" data-i18n="tw.source">1990 服務語言與時段</a>
     </div>
-    <div class="emrg-box"><div class="emrg-title" data-i18n="help.ecTitle">緊急避孕</div><p data-i18n="help.ec">若未避孕或避孕失敗，請盡快聯絡醫師或藥師。依方法不同，緊急避孕通常需在 3–5 天內使用；各地取得方式不同。</p><a href="https://www.who.int/news-room/fact-sheets/detail/emergency-contraception" data-i18n="help.source">參考來源</a></div>
-    <div class="emrg-box warn"><div class="emrg-title" data-i18n="help.testTitle">驗孕時機</div><p data-i18n="help.test">可從月經該來卻沒來的第一天驗孕；若不知道下次月經日期，在最後一次無保護性行為至少 21 天後檢測。請依試劑說明操作。</p><a href="https://www.nhs.uk/pregnancy/trying-for-a-baby/doing-a-pregnancy-test/" data-i18n="help.source">參考來源</a></div>
-    <div class="emrg-box safe"><div class="emrg-title" data-i18n="help.planTitle">規劃與諮詢</div><p id="helpPlan"></p><a href="https://www.acog.org/womens-health/faqs/fertility-awareness-based-methods-of-family-planning" data-i18n="help.source">參考來源</a></div>
-<details class="guide-detail"><summary data-i18n="guide.ecTitle"></summary><div><p data-i18n="guide.ec"></p><a href="https://www.who.int/news-room/fact-sheets/detail/emergency-contraception" data-i18n="help.source">參考來源</a></div></details>
-<details class="guide-detail"><summary data-i18n="guide.optionsTitle"></summary><div><p data-i18n="guide.options"></p><a href="https://www.nhs.uk/contraception/methods-of-contraception/" data-i18n="help.source">參考來源</a></div></details>
-<details class="guide-detail"><summary data-i18n="guide.signalsTitle"></summary><div><p data-i18n="guide.signals"></p><a href="https://www.nhs.uk/contraception/methods-of-contraception/natural-family-planning/" data-i18n="help.source">參考來源</a></div></details>
-<details class="guide-detail"><summary data-i18n="guide.partnerTitle"></summary><div><p data-i18n="guide.partner"></p><a href="https://www.nhs.uk/contraception/methods-of-contraception/vasectomy-male-sterilisation/what-is-it/" data-i18n="help.source">參考來源</a></div></details>
+
     <div class="disclaimer-box" data-i18n="help.note">此工具提供記錄與預估，不作診斷。個人避孕或備孕決定請諮詢合格醫療人員。</div>
   </div>
 
@@ -433,6 +428,7 @@
 <script src="locales/th.js"></script>
 <script src="locales/vi.js"></script>
 <script src="js/i18n.js"></script>
+<script src="locales/guide-emphasis.js"></script>
 <script src="js/cycle.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/chart.js"></script>

@@ -636,37 +636,37 @@ html:lang(de) .signal-label strong,html:lang(es) .signal-label strong,html:lang(
 .region-settings { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:0 0 16px; font-size:13px; }
 .region-settings select { width:auto; max-width:100%; padding:6px 28px 6px 10px; font-size:13px; border-radius:12px; }
 .region-settings small { flex-basis:100%; opacity:.8; }
-.settings-card { margin:16px 0 28px; padding:8px 20px 18px; border:1px solid var(--border); border-radius:20px; background:var(--white); }
-.settings-preferences .audience-picker, .settings-card .region-settings { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 0; margin:0; border-bottom:1px solid var(--border); color:var(--text); font-size:14px; }
+.settings-card { margin:10px 0 24px; padding:4px 20px 14px; border:1px solid var(--border); border-radius:20px; background:var(--white); }
+.settings-preferences .audience-picker, .settings-card .region-settings { display:flex; align-items:center; justify-content:space-between; gap:8px 12px; padding:10px 0; margin:0; border-bottom:1px solid var(--border); color:var(--text); font-size:14px; line-height:1.5; }
 .settings-preferences label, .settings-card .region-settings label { flex:1; min-width:0; }
-.settings-preferences .audience-select, .settings-card .region-settings select { width:auto; max-width:60%; min-height:40px; padding:6px 10px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font:inherit; }
+.settings-preferences .audience-select, .settings-card .region-settings select { width:auto; max-width:60%; min-height:44px; padding:6px 10px; border:1px solid var(--border); border-radius:10px; background:var(--pink-bg); color:var(--text); font:inherit; }
 .settings-card .region-settings small { color:var(--text-sub); font-size:12px; line-height:1.6; }
-.settings-privacy { padding-top:14px; }
+.settings-privacy { padding-top:12px; }
 .settings-privacy .privacy-badge { display:block; margin:0; padding:0; border:0; background:none; white-space:normal; line-height:1.6; }
 .settings-help-title { margin:0 0 8px; font-size:18px; }
 
 /* Quiet, editorial typography for settings and supporting information. */
 #page-emergency { --reading-ink:#51464b; --reading-muted:#71636a; }
-#page-emergency .section-title { font-size:23px; font-weight:600; letter-spacing:.04em; }
+#page-emergency .section-title { margin-bottom:8px; font-size:22px; font-weight:600; letter-spacing:.025em; line-height:1.45; }
 #page-emergency .settings-help-title {
-  margin:30px 0 10px;
+  margin:22px 0 8px;
   font-family:"Huninn","Microsoft JhengHei","PingFang TC","Noto Sans TC","Segoe UI",sans-serif;
-  font-size:20px; font-weight:500; letter-spacing:.06em; line-height:1.6;
+  font-size:18px; font-weight:500; letter-spacing:.025em; line-height:1.5;
 }
-#page-emergency .page-intro { margin:0 0 22px; font-size:14px; line-height:1.9; color:var(--reading-muted); }
+#page-emergency .page-intro { margin:0 0 16px; font-size:13px; line-height:1.75; color:var(--reading-muted); }
 #page-emergency .emrg-box {
-  padding:22px 24px 16px; margin-bottom:16px;
+  padding:18px 22px 12px; margin-bottom:14px;
   border:1px solid #eee6e7; border-left:3px solid #bc7b8e;
   border-radius:18px; box-shadow:0 4px 18px rgba(65,37,48,.025);
 }
 #page-emergency .emrg-box.warn { border-left-color:#bb965b; }
 #page-emergency .emrg-box.safe { border-left-color:#7c9c88; }
 #page-emergency .emrg-title {
-  margin-bottom:12px; color:#44393f;
+  margin-bottom:8px; color:#44393f;
   font-family:"Huninn","Microsoft JhengHei","PingFang TC","Noto Sans TC","Segoe UI",sans-serif;
-  font-size:17px; font-weight:600; line-height:1.6; letter-spacing:.035em;
+  font-size:16px; font-weight:600; line-height:1.5; letter-spacing:.02em;
 }
-#page-emergency .emrg-box p { margin-bottom:8px; font-size:14px; font-weight:400; line-height:1.95; color:var(--reading-ink); overflow-wrap:anywhere; }
+#page-emergency .emrg-box p { margin-bottom:10px; font-size:14px; font-weight:400; line-height:1.8; color:var(--reading-ink); overflow-wrap:anywhere; }
 #page-emergency .emrg-box a {
   display:inline-flex; align-items:center; gap:8px; min-height:44px;
   color:#855264; font-size:12px; font-weight:500; line-height:1.6;
@@ -682,7 +682,7 @@ html:lang(de) .signal-label strong,html:lang(es) .signal-label strong,html:lang(
 }
 @media(max-width:480px) {
   #page-emergency .emrg-box { padding:18px 18px 12px; }
-  #page-emergency .settings-help-title { font-size:19px; }
+  #page-emergency .settings-help-title { font-size:17px; }
   #page-emergency .emrg-title { font-size:16px; }
 }
 /* Huninn has one regular weight; avoid synthetic bold in the rounded headings. */
@@ -705,9 +705,53 @@ html:lang(de) .signal-label strong,html:lang(es) .signal-label strong,html:lang(
 #sharePlainText { width:100%; min-height:300px; resize:vertical; padding:14px; border:1px solid var(--border); border-radius:12px; font-size:14px; line-height:1.8; font-family:inherit; background:white; color:var(--text); }
 .share-dialog .btn-outline, .share-dialog .btn-primary { margin-top:12px; width:100%; }
 #page-emergency .guide-detail { margin:12px 0; border:1px solid var(--border); border-radius:16px; background:white; overflow:hidden; }
-.guide-detail summary { padding:18px 20px; cursor:pointer; font-size:15px; line-height:1.6; color:var(--text); }
+.guide-detail summary { padding:14px 18px; cursor:pointer; font-size:14px; line-height:1.6; color:var(--text); }
 .guide-detail[open] summary { border-bottom:1px solid var(--border); background:var(--pink-pale); }
 .guide-detail summary:focus-visible { outline:2px solid var(--pink); outline-offset:-4px; border-radius:16px; }
-.guide-detail > div { padding:16px 20px; }
-.guide-detail p { font-size:14px; line-height:1.95; color:#51464b; overflow-wrap:anywhere; }
+.guide-detail > div { padding:14px 18px; }
+.guide-detail p { font-size:14px; line-height:1.8; color:#51464b; overflow-wrap:anywhere; }
 .guide-detail a { display:inline-flex; align-items:center; min-height:44px; font-size:12px; color:#855264; text-underline-offset:4px; }
+
+/* Settings has its own heading, with preferences grouped above the reading area. */
+.app-body:has(#page-emergency.active) > .welcome { display:none; }
+#page-emergency > .section-title { font-size:28px; line-height:1.35; letter-spacing:.015em; margin:2px 0 8px; }
+#page-emergency > .page-intro { max-width:58ch; }
+#page-emergency .settings-card { padding:18px 20px 14px; margin:24px 0 32px; border-radius:18px; box-shadow:0 3px 16px #49333b04; }
+#page-emergency .settings-card > .settings-help-title { line-height:1.5; font-size:12px; font-family:inherit; font-weight:600; letter-spacing:.08em; color:var(--text-sub); margin:0 0 16px; }
+.settings-preferences { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; }
+.settings-preferences .audience-picker { display:flex; flex-direction:column; align-items:stretch; gap:7px; padding:0; border:0; min-width:0; }
+.settings-preferences label { font-size:12px; color:#76616c; }
+.settings-preferences .audience-select { width:100%; max-width:100%; background:#faf7f8; border-color:#eee5e8; font-size:14px; }
+.settings-card .region-settings { padding:14px 0 12px; margin-top:16px; border-top:1px solid var(--border); border-bottom:0; font-size:12px; }
+.settings-card .region-settings select { font-size:13px; background:white; }
+.settings-card .region-settings small { font-size:11px; }
+.settings-privacy { padding-top:10px; border-top:1px solid var(--border); }
+.settings-privacy .privacy-badge { font-size:11px; color:#82747b; }
+#page-emergency #purposeGuideTitle { font-size:21px; margin:0 0 8px; letter-spacing:.01em; }
+#page-emergency #helpIntro { margin-bottom:20px; }
+#purposeGuide { background:white; border:1px solid #eee5e8; border-radius:20px; padding:0 20px 14px; }
+#page-emergency #purposeGuide .emrg-box { margin:0; padding:22px 0 16px; background:none; border:0; border-bottom:1px solid #eee5e8; border-radius:0; box-shadow:none; }
+#page-emergency #purposeGuide .emrg-title { font-size:17px; margin-bottom:10px; color:#684754; }
+#page-emergency #purposeGuide .emrg-box p { line-height:1.85; margin-bottom:2px; }
+#page-emergency #purposeGuide > .settings-help-title { font-family:inherit; font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--text-sub); margin:22px 0 10px; }
+#page-emergency .guide-detail { border:0; border-bottom:1px solid #eee5e8; border-radius:0; margin:0; background:none; }
+#page-emergency .guide-detail:last-child { border-bottom:0; }
+.guide-detail summary { padding:14px 0; }
+.guide-detail[open] summary { background:none; border:0; color:var(--pink); }
+.guide-detail > div { padding:0 0 12px; }
+#page-emergency #taiwanHelp { margin-top:20px; background:#f0f4f0; border:0; border-radius:16px; }
+#page-emergency #taiwanHelp .emrg-title { font-size:15px; }
+#page-emergency #taiwanHelp p { font-size:13px; }
+@media(min-width:768px) { #page-emergency.active { max-width:660px; } }
+
+/* Emphasis follows the meaning of the guidance, not its position in the list. */
+#purposeGuide .guide-emphasis { font-weight:700; color:#684452; }
+#page-emergency #purposeGuide .guide-priority.emrg-box {
+  margin:16px 0; padding:16px 18px; border:1px solid #dfb8c4;
+  border-left:3px solid #ad4e6a; border-radius:12px; background:#fcf3f6;
+}
+#page-emergency #purposeGuide .guide-priority .emrg-title { color:#903c58; }
+#purposeGuide .guide-priority .guide-emphasis { color:#85364f; }
+#purposeGuide .guide-timing .guide-emphasis { color:#80520c; background:#fcf1d9; padding:1px 3px; border-radius:3px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+#page-emergency #purposeGuide .guide-timing > .emrg-title { color:#805b28; }
+#purposeGuide .guide-detail[open] > summary { font-weight:600; }
