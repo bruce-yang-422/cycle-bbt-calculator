@@ -1,4 +1,5 @@
 /* HTML event bindings, kept separate from markup and calculations. */
+document.getElementById('resetAllBtn').addEventListener('click', resetAllData);
 document.querySelector('[data-control="control-1"]').addEventListener('click', function(event){handleInstallClick();});
 document.querySelector('[data-control="control-2"]').addEventListener('click', function(event){dismissInstallBanner();});
 document.querySelector('[data-control="control-3"]').addEventListener('click', function(event){gotoPage('calendar',this);});

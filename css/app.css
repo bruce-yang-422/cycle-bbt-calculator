@@ -727,6 +727,9 @@ html:lang(de) .signal-label strong,html:lang(es) .signal-label strong,html:lang(
 .settings-card .region-settings small { font-size:11px; }
 .settings-privacy { padding-top:10px; border-top:1px solid var(--border); }
 .settings-privacy .privacy-badge { font-size:11px; color:#82747b; }
+.settings-reset { margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+.settings-reset p { margin:0 0 12px; color:var(--text-sub); font-size:12px; line-height:1.7; }
+.settings-reset .btn-outline { width:100%; color:#a12b43; border-color:#a12b43; }
 #page-emergency #purposeGuideTitle { font-size:21px; margin:0 0 8px; letter-spacing:.01em; }
 #page-emergency #helpIntro { margin-bottom:20px; }
 #purposeGuide { background:white; border:1px solid #eee5e8; border-radius:20px; padding:0 20px 14px; }
