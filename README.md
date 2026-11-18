@@ -62,7 +62,7 @@ npm run build
 npm run preview
 ```
 
-建置會將專案根目錄的 `CNAME`、Google 驗證檔、`robots.txt` 和 `sitemap.xml` 原樣複製到 `dist/`。部署時將 `dist/` 的內容發佈到網域根目錄。GitHub Pages 若使用 Actions 部署，請將 `dist/` 設為上傳的網站產物。若使用分支發佈，請將 `dist/` 內容放在設定的發佈來源。
+建置會將專案根目錄的 `CNAME`、Google 驗證檔、`robots.txt` 和 `sitemap.xml` 原樣複製到 `dist/`。正式站使用 GitHub Pages，發佈來源設為 **GitHub Actions**。`main` 更新時，[`pages.yml`](.github/workflows/pages.yml) 會安裝依賴、執行測試、建置並發佈 `dist/`。若部署到其他靜態主機，將 `dist/` 的內容放到網域根目錄。
 
 ## 核心邏輯
 
