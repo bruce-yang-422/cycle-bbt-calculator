@@ -136,12 +136,19 @@ async function checkUnprotected(page) {
   assert.equal(await page.locator('#calGrid [data-date="2026-01-28"] .cell-unp').count(), 1);
   assert.deepEqual(JSON.parse(await page.evaluate(() => localStorage.getItem('unprotectedLog'))), ['2026-01-28']);
 
-  // Other purposes never see the feature or its markers.
+  // Other purposes get only quiet entry points, but the user's own record and reminder stay.
   for (const mode of ['tracking', 'conception']) {
     await goTo(page, 'emergency');
     await page.locator('#audienceSelect').selectOption(mode);
+    assert(await page.locator('#guideUnp').isVisible(), mode + ' guide entry');
     await goTo(page, 'calendar');
-    assert.equal(await page.locator('[data-control="control-34"], #unpReminder, .cell-unp').count(), 0, mode);
+    assert.equal(await page.locator('[data-control="control-34"]').count(), 0, mode);
+    assert(await page.locator('#unpLink').isVisible(), mode + ' home link');
+    assert(await page.locator('#unpReminder').isVisible(), mode + ' reminder');
+    await page.locator('#unpLink').click();
+    await page.locator('#unprotectedDialog').waitFor({ state: 'visible' });
+    await page.keyboard.press('Escape');
+    await page.locator('#unprotectedDialog').waitFor({ state: 'hidden' });
   }
 
   await goTo(page, 'emergency');

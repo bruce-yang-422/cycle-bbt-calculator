@@ -11,6 +11,7 @@ const emit = defineEmits<{
   'update:audience': [mode: AudienceMode]
   reset: []
   'storage-error': []
+  unprotected: []
 }>()
 
 const sources = {
@@ -172,6 +173,14 @@ onMounted(() => {
     </div>
 
     <div class="guide-column">
+    <button id="guideUnp" type="button" class="action-row" @click="emit('unprotected')">
+      <span class="action-row-icon"><AppIcon name="shield" :size="20" /></span>
+      <span class="action-copy">
+        <strong>{{ t('unp.action') }}</strong>
+        <small>{{ t('unp.actionSub') }}</small>
+      </span>
+      <AppIcon class="row-arrow" name="right" :size="18" />
+    </button>
     <h3 id="purposeGuideTitle" class="block-title">{{ t(plan.title) }}</h3>
     <p id="helpIntro" class="page-intro">{{ t(`${audience}.hint`) }}</p>
     <div id="purposeGuide">

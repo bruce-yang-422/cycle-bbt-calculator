@@ -76,11 +76,12 @@ const summary = computed(() => {
 
 const selectedIsPast = computed(() => selectedDate.value <= today.value)
 
-// Unprotected-sex tools appear only in contraception mode, so other users never see them.
+// The unprotected-sex entry is prominent only in contraception mode; other purposes get a quiet
+// link, so anyone can reach it in an emergency. Records the user made always show.
 const contraception = computed(() => props.audience === 'contraception')
-const unprotectedDates = computed(() => new Set(contraception.value ? unprotected.value : []))
+const unprotectedDates = computed(() => new Set(unprotected.value))
 const reminder = computed(() => {
-  const date = contraception.value && activeUnprotected(unprotected.value, today.value)
+  const date = activeUnprotected(unprotected.value, today.value)
   return date ? { date, ...unprotectedPlan(date, today.value, dayMap.value) } : null
 })
 
@@ -282,6 +283,7 @@ defineExpose({ hideDetails: () => { showDetails.value = false } })
       <div class="home-links">
         <button type="button" class="btn btn-ghost setup-btn" data-control="control-10" @click="emit('setup')"><AppIcon name="edit" :size="17" />{{ t('setup.open') }}</button>
         <button id="shareCycleBtn" type="button" class="btn btn-ghost share-entry" :class="{ hidden: !calcParams }" @click="emit('share')"><AppIcon name="share" :size="17" />{{ t('share.open') }}</button>
+        <button v-if="!contraception" id="unpLink" type="button" class="btn btn-ghost" @click="emit('unprotected')"><AppIcon name="shield" :size="17" />{{ t('unp.action') }}</button>
       </div>
       <p id="purposeNote" class="fine-print">{{ modeCopy.note }}</p>
     </div>

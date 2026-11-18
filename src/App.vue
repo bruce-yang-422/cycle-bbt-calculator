@@ -165,6 +165,7 @@ function reset() {
       @update:audience="setAudience"
       @reset="reset"
       @storage-error="notify(t('error.storage'))"
+      @unprotected="unprotectedDialog?.open()"
     />
 
     <InstallControls />
