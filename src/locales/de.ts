@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "Änderungen dieser Erklärung",
   "privacy.changes": "Ändert sich diese Erklärung, aktualisieren wir das Gültigkeitsdatum auf dieser Seite und beschreiben wesentliche Änderungen hier.",
   "privacy.contactTitle": "Kontakt",
-  "privacy.contact": "Bei Fragen zum Datenschutz erreichst du uns über GitHub Issues."
+  "privacy.contact": "Bei Fragen zum Datenschutz erreichst du uns über GitHub Issues.",
+  "backup.title": "Datensicherung",
+  "backup.intro": "Exportiere alle Einträge und Einstellungen als CSV-Datei und importiere sie auf einem anderen Gerät oder Browser zur Wiederherstellung.",
+  "backup.export": "Sicherung exportieren",
+  "backup.import": "Sicherung importieren",
+  "backup.warn": "Die Sicherung enthält deine Gesundheitsdaten. Bewahre sie vertraulich auf.",
+  "backup.filename": "zyklus-temperatur-sicherung",
+  "backup.confirm": "Alle aktuellen Einträge durch diese Sicherung ersetzen?\n{periods} Perioden, {temps} Temperaturen, {unprotected} ungeschützte Einträge.\nDas lässt sich nicht rückgängig machen.",
+  "backup.invalid": "Diese Datei kann nicht gelesen werden. Prüfe, ob es eine von dieser Seite exportierte Sicherung ist. Deine aktuellen Daten sind unverändert.",
+  "backup.exported": "Sicherung exportiert",
+  "backup.restored": "Sicherung importiert"
 };

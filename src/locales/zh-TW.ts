@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "政策變更",
   "privacy.changes": "本政策更新時，我們會修改此頁的生效日期；重大變更會在此說明。",
   "privacy.contactTitle": "聯絡我們",
-  "privacy.contact": "對隱私有任何疑問，歡迎透過 GitHub Issues 與我們聯絡。"
+  "privacy.contact": "對隱私有任何疑問，歡迎透過 GitHub Issues 與我們聯絡。",
+  "backup.title": "資料備份",
+  "backup.intro": "將所有記錄與設定匯出成 CSV 檔，可在其他裝置或瀏覽器匯入還原。",
+  "backup.export": "匯出備份",
+  "backup.import": "匯入備份",
+  "backup.warn": "備份檔含有你的健康記錄，請妥善保管。",
+  "backup.filename": "週期與體溫備份",
+  "backup.confirm": "要用這份備份取代目前所有記錄嗎？\n月經 {periods} 筆、體溫 {temps} 筆、無保護記錄 {unprotected} 筆。\n此操作無法復原。",
+  "backup.invalid": "無法讀取這個檔案，請確認是本網站匯出的備份。目前的資料未變更。",
+  "backup.exported": "已匯出備份",
+  "backup.restored": "已匯入備份"
 };

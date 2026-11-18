@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "Changes to this policy",
   "privacy.changes": "If this policy changes, we will update the effective date on this page and describe significant changes here.",
   "privacy.contactTitle": "Contact",
-  "privacy.contact": "For any privacy questions, contact us through GitHub Issues."
+  "privacy.contact": "For any privacy questions, contact us through GitHub Issues.",
+  "backup.title": "Backup",
+  "backup.intro": "Export all records and settings as a CSV file, then import it on another device or browser to restore.",
+  "backup.export": "Export backup",
+  "backup.import": "Import backup",
+  "backup.warn": "The backup file contains your health records. Keep it private.",
+  "backup.filename": "cycle-temperature-backup",
+  "backup.confirm": "Replace all current records with this backup?\n{periods} periods, {temps} temperatures, {unprotected} unprotected records.\nThis cannot be undone.",
+  "backup.invalid": "This file can’t be read. Make sure it is a backup exported from this site. Your current data is unchanged.",
+  "backup.exported": "Backup exported",
+  "backup.restored": "Backup imported"
 };

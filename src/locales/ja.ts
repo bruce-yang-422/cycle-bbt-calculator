@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "ポリシーの変更",
   "privacy.changes": "本ポリシーを変更する場合は、このページの施行日を更新し、重要な変更はここに記載します。",
   "privacy.contactTitle": "お問い合わせ",
-  "privacy.contact": "プライバシーに関するご質問は、GitHub Issues からお問い合わせください。"
+  "privacy.contact": "プライバシーに関するご質問は、GitHub Issues からお問い合わせください。",
+  "backup.title": "データのバックアップ",
+  "backup.intro": "すべての記録と設定を CSV ファイルに書き出し、別の端末やブラウザで読み込んで復元できます。",
+  "backup.export": "バックアップを書き出す",
+  "backup.import": "バックアップを読み込む",
+  "backup.warn": "バックアップには健康の記録が含まれます。大切に保管してください。",
+  "backup.filename": "周期と体温のバックアップ",
+  "backup.confirm": "現在の記録をすべてこのバックアップで置き換えますか？\n生理 {periods} 件、体温 {temps} 件、避妊なしの記録 {unprotected} 件。\nこの操作は元に戻せません。",
+  "backup.invalid": "このファイルを読み込めません。このサイトで書き出したバックアップか確認してください。現在のデータは変更されていません。",
+  "backup.exported": "バックアップを書き出しました",
+  "backup.restored": "バックアップを読み込みました"
 };

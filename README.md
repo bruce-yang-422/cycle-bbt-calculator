@@ -19,6 +19,7 @@
 - 月經開始日歷史與週期統計
 - 無保護性行為記錄：事後避孕時限與驗孕日
 - 三種使用目的（避孕、月經記錄、備孕）共用同一套計算，只切換文案
+- CSV 備份匯出與匯入
 - 淺色／深色／跟隨系統、八種語言、PNG／文字分享、可安裝的離線 PWA
 
 ## 技術棧
@@ -66,6 +67,7 @@ src/
 ├── unprotected.ts         事後避孕時限與驗孕日（純函式）
 ├── useCycle.ts            反應式狀態與所有寫入操作
 ├── storage.ts             localStorage 讀寫、驗證與重置
+├── backup.ts              CSV 備份的匯出、解析與還原
 ├── theme.ts / region.ts   外觀與地區偏好
 ├── i18n.ts / locales/     翻譯與 Intl 格式化
 ├── chart.ts / share.ts    Canvas 走勢圖與分享圖片
@@ -138,6 +140,26 @@ locales/tests/             單元與瀏覽器測試
 
 新增鍵值時，請一併加入 `storage.ts` 的 `appStorageKeys`，`resetAllData()` 才會清除它。
 
+### 備份格式
+
+[`backup.ts`](src/backup.ts) 匯出 UTF-8（含 BOM）CSV，每列為 `record,key,value`，欄位名稱與 `record` 類型固定為英文，不隨介面語言改變：
+
+```text
+record,key,value
+meta,format,cycle-bbt-backup
+meta,version,1
+setting,lastPeriod,2026-11-05
+period,2026-10-08,
+bbt,2026-11-18,36.68
+unprotected,2026-11-16,
+preference,language,zh-TW
+```
+
+- 檔名格式為 `<lang>_<name>_<date>.csv`，以語言代碼開頭、名稱依介面語言翻譯，例如 `en_cycle-temperature-backup_2026-11-18.csv`、`zh-TW_週期與體溫備份_2026-11-18.csv`。
+- `parseBackup()` 先驗證整份檔案，任何一列無效就整份拒絕，不會部分覆蓋；未知的 `record` 類型會略過，保留向後相容。
+- 還原時取代所有記錄；備份內有的偏好會覆寫，沒有的則保留。`installBannerDismissed` 屬於裝置層級設定，不會匯出。
+- 格式變更時請遞增 `backupVersion`；版本較新的檔案會被拒絕。
+
 網站只發出兩種外部請求：Google Fonts，以及「自動判斷地區」時的同網域 Cloudflare `/cdn-cgi/trace`（只讀 `loc`）。隱私權政策全文在 [`InfoDialogs.vue`](src/components/InfoDialogs.vue) 與各語言檔；政策內容變更時，請同步更新該檔的 `policyDate`。
 
 ## 國際化
@@ -184,6 +206,7 @@ npm run test:browser
 | [`bbt.test.cjs`](locales/tests/bbt.test.cjs) | BBT 演算法 |
 | [`locales.test.cjs`](locales/tests/locales.test.cjs) | 翻譯鍵值與參數、HTML 入口、manifest 圖示 |
 | [`storage.test.cjs`](locales/tests/storage.test.cjs) | 一鍵清除並重置 |
+| [`backup.test.cjs`](locales/tests/backup.test.cjs) | 備份往返、試算表編輯容錯、無效檔案拒絕、檔名 |
 | [`readme.test.cjs`](locales/tests/readme.test.cjs) | 中英文 README 結構同步 |
 | [`browser.cjs`](locales/tests/browser.cjs) | 對 `dist/` 進行端對端測試：8 語言 × 3 使用目的 × 4 頁面 × 3 寬度，加上各項使用流程與離線 |
 

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AppIcon from './AppIcon.vue'
+import { applyBackup, backupFilename, buildBackup, parseBackup } from '../backup'
+import { localISO } from '../cycle'
 import { audienceModes, isAudienceMode, type AudienceMode } from '../audience'
-import { language, languageNames, setLanguage, supportedLanguages, t, type TranslationKey } from '../i18n'
+import { formatNumber, language, languageNames, setLanguage, supportedLanguages, t, type TranslationKey } from '../i18n'
 import { guideEmphasis } from '../locales/guide-emphasis'
 import { detectRegion, isTaiwanRegion, regionChecking, regionPreference, regionStatus, setRegion } from '../region'
 
@@ -13,6 +15,7 @@ const emit = defineEmits<{
   'storage-error': []
   unprotected: []
   info: [page: 'about' | 'privacy']
+  notice: [message: string]
 }>()
 
 const sources = {
@@ -123,6 +126,53 @@ function changeRegion(event: Event) {
   if (!setRegion((event.target as HTMLSelectElement).value)) emit('storage-error')
 }
 
+const backupInput = ref<HTMLInputElement | null>(null)
+
+function exportBackup() {
+  const today = localISO(new Date())
+  const csv = buildBackup(localStorage, { exported: today, app: __APP_VERSION__ })
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = backupFilename(language.value, t('backup.filename'), today)
+  document.body.append(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  emit('notice', t('backup.exported'))
+}
+
+async function importBackup(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  const parsed = parseBackup(await file.text(), supportedLanguages)
+  if (!parsed.ok) {
+    emit('notice', t('backup.invalid'))
+    return
+  }
+  const { periods, temperatures, unprotected } = parsed.data
+  const counts = { periods: formatNumber(periods.length), temps: formatNumber(temperatures.length), unprotected: formatNumber(unprotected.length) }
+  if (!window.confirm(t('backup.confirm', counts))) return
+  try {
+    applyBackup(parsed.data, localStorage)
+    sessionStorage.setItem('backupRestored', '1')
+  } catch {
+    emit('storage-error')
+    return
+  }
+  // `?lang=` outranks stored preferences, so point it at the restored language before reloading.
+  const restoredLanguage = parsed.data.preferences.language
+  if (restoredLanguage) {
+    const url = new URL(location.href)
+    url.searchParams.set('lang', restoredLanguage)
+    history.replaceState(null, '', url)
+  }
+  // Reloading lets every module re-read storage instead of patching live state piecemeal.
+  location.reload()
+}
+
 onMounted(() => {
   if (regionPreference.value === 'auto' && !regionChecking.value) void detectRegion()
 })
@@ -170,6 +220,16 @@ onMounted(() => {
           <AppIcon name="trash" :size="17" />{{ t('reset.button') }}
         </button>
       </div>
+    </div>
+    <div class="card backup-card">
+      <h3 class="card-title">{{ t('backup.title') }}</h3>
+      <p class="backup-intro">{{ t('backup.intro') }}</p>
+      <div class="backup-actions">
+        <button id="backupExport" type="button" class="btn btn-ghost" @click="exportBackup"><AppIcon name="download" :size="17" />{{ t('backup.export') }}</button>
+        <button id="backupImport" type="button" class="btn btn-ghost" @click="backupInput?.click()"><AppIcon name="share" :size="17" />{{ t('backup.import') }}</button>
+      </div>
+      <input id="backupFile" ref="backupInput" class="visually-hidden" type="file" accept=".csv,text/csv" tabindex="-1" aria-hidden="true" @change="importBackup">
+      <p class="fine-print backup-warn"><AppIcon name="lock" :size="13" />{{ t('backup.warn') }}</p>
     </div>
     <div class="card info-card">
       <button id="settingsAbout" type="button" class="info-link" @click="emit('info', 'about')">

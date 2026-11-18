@@ -53,6 +53,16 @@ onMounted(() => {
   }
   audienceDialog.value?.showModal()
 })
+onMounted(() => {
+  try {
+    if (sessionStorage.getItem('backupRestored')) {
+      sessionStorage.removeItem('backupRestored')
+      notify(t('backup.restored'))
+    }
+  } catch {
+    // Nothing to announce when session storage is unavailable.
+  }
+})
 onUnmounted(() => clearTimeout(toastTimer))
 // Mode-specific colour tokens (e.g. a neutral low-risk tone for contraception) key off this attribute.
 watchEffect(() => { document.documentElement.dataset.mode = audience.value })
@@ -171,6 +181,7 @@ function reset() {
       @storage-error="notify(t('error.storage'))"
       @unprotected="unprotectedDialog?.open()"
       @info="info?.open($event)"
+      @notice="notify"
     />
 
     <InstallControls />

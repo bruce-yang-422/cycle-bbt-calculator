@@ -19,6 +19,7 @@ A PWA that estimates menstrual cycles with the calendar method and basal body te
 - Period start history and cycle statistics
 - Unprotected-sex log with emergency contraception time limits and a test date
 - Three purposes (contraception, period tracking, conception) share one calculation and only switch copy
+- CSV backup export and import
 - Light / dark / system themes, eight languages, PNG/text sharing, installable offline PWA
 
 ## Tech stack
@@ -66,6 +67,7 @@ src/
 ├── unprotected.ts         EC time limits and test date (pure functions)
 ├── useCycle.ts            Reactive state and all write operations
 ├── storage.ts             localStorage read/write, validation and reset
+├── backup.ts              CSV backup export, parsing and restore
 ├── theme.ts / region.ts   Appearance and region preferences
 ├── i18n.ts / locales/     Translations and Intl formatting
 ├── chart.ts / share.ts    Canvas trend chart and share image
@@ -138,6 +140,26 @@ All state lives in `localStorage`; reads are validated and invalid data is ignor
 
 When adding a key, also add it to `appStorageKeys` in `storage.ts` so `resetAllData()` clears it.
 
+### Backup format
+
+[`backup.ts`](src/backup.ts) exports UTF-8 CSV (with BOM), one `record,key,value` row per item. Column names and `record` types are fixed English identifiers and never change with the interface language:
+
+```text
+record,key,value
+meta,format,cycle-bbt-backup
+meta,version,1
+setting,lastPeriod,2026-11-05
+period,2026-10-08,
+bbt,2026-11-18,36.68
+unprotected,2026-11-16,
+preference,language,zh-TW
+```
+
+- File names follow `<lang>_<name>_<date>.csv`, starting with the language code and with the name translated to the interface language, e.g. `en_cycle-temperature-backup_2026-11-18.csv` or `zh-TW_週期與體溫備份_2026-11-18.csv`.
+- `parseBackup()` validates the whole file first and rejects it if any row is invalid, so nothing is partially overwritten; unknown `record` types are skipped for forward compatibility.
+- Restoring replaces all records; preferences present in the file override, others are kept. `installBannerDismissed` is device-specific and not exported.
+- Bump `backupVersion` when the format changes; files with a newer version are rejected.
+
 The site makes only two kinds of external request: Google Fonts, and the same-domain Cloudflare `/cdn-cgi/trace` when region is set to automatic (only `loc` is read). The full privacy policy lives in [`InfoDialogs.vue`](src/components/InfoDialogs.vue) and the locale files; when its substance changes, update `policyDate` in that file.
 
 ## Internationalization
@@ -184,6 +206,7 @@ npm run test:browser
 | [`bbt.test.cjs`](locales/tests/bbt.test.cjs) | BBT algorithm |
 | [`locales.test.cjs`](locales/tests/locales.test.cjs) | Translation keys and placeholders, HTML entries, manifest icons |
 | [`storage.test.cjs`](locales/tests/storage.test.cjs) | Clear all data & reset |
+| [`backup.test.cjs`](locales/tests/backup.test.cjs) | Backup round trip, spreadsheet-edit tolerance, invalid-file rejection, file names |
 | [`readme.test.cjs`](locales/tests/readme.test.cjs) | Structural sync between the Chinese and English READMEs |
 | [`browser.cjs`](locales/tests/browser.cjs) | End-to-end tests against `dist/`: 8 languages × 3 purposes × 4 pages × 3 widths, plus user flows and offline |
 

@@ -1134,6 +1134,15 @@ button.cal-cell.safe:hover      { filter: var(--hover); }
 .unp-tests li { position: relative; padding-left: 16px; font-size: 14px; line-height: 1.65; }
 .unp-tests li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--ovul-solid); }
 
+/* Backup */
+.backup-card { display: grid; gap: 12px; padding: 20px; }
+.backup-card .card-title { margin-bottom: 0; }
+.backup-intro { font-size: 13px; line-height: 1.65; color: var(--text-2); }
+.backup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.backup-actions .btn { padding: 0 12px; }
+.backup-warn { display: flex; align-items: center; gap: 6px; padding: 0; }
+@media (max-width: 380px) { .backup-actions { grid-template-columns: 1fr; } }
+
 /* About & privacy */
 .info-dialog { padding: 0; width: min(520px, calc(100% - 32px)); }
 .info-body { display: grid; gap: 16px; padding: 18px 22px 24px; }

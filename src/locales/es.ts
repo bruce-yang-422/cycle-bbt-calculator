@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "Cambios en esta política",
   "privacy.changes": "Si esta política cambia, actualizaremos la fecha de vigencia en esta página y describiremos aquí los cambios importantes.",
   "privacy.contactTitle": "Contacto",
-  "privacy.contact": "Para cualquier duda sobre privacidad, contáctanos a través de GitHub Issues."
+  "privacy.contact": "Para cualquier duda sobre privacidad, contáctanos a través de GitHub Issues.",
+  "backup.title": "Copia de seguridad",
+  "backup.intro": "Exporta todos los registros y ajustes a un archivo CSV e impórtalo en otro dispositivo o navegador para restaurarlos.",
+  "backup.export": "Exportar copia",
+  "backup.import": "Importar copia",
+  "backup.warn": "La copia contiene tus registros de salud. Guárdala en privado.",
+  "backup.filename": "copia-ciclo-temperatura",
+  "backup.confirm": "¿Reemplazar todos los registros actuales con esta copia?\n{periods} periodos, {temps} temperaturas, {unprotected} registros sin protección.\nNo se puede deshacer.",
+  "backup.invalid": "No se puede leer este archivo. Comprueba que sea una copia exportada desde este sitio. Tus datos actuales no han cambiado.",
+  "backup.exported": "Copia exportada",
+  "backup.restored": "Copia importada"
 };

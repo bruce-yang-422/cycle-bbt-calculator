@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "방침 변경",
   "privacy.changes": "이 방침이 바뀌면 이 페이지의 시행일을 업데이트하고 중요한 변경 사항은 여기에 안내합니다.",
   "privacy.contactTitle": "문의",
-  "privacy.contact": "개인정보 관련 문의는 GitHub Issues로 연락해 주세요."
+  "privacy.contact": "개인정보 관련 문의는 GitHub Issues로 연락해 주세요.",
+  "backup.title": "데이터 백업",
+  "backup.intro": "모든 기록과 설정을 CSV 파일로 내보내고, 다른 기기나 브라우저에서 가져와 복원할 수 있어요.",
+  "backup.export": "백업 내보내기",
+  "backup.import": "백업 가져오기",
+  "backup.warn": "백업 파일에는 건강 기록이 들어 있어요. 안전하게 보관하세요.",
+  "backup.filename": "주기와-체온-백업",
+  "backup.confirm": "현재 기록을 모두 이 백업으로 바꿀까요?\n생리 {periods}건, 체온 {temps}건, 피임 안 함 기록 {unprotected}건.\n되돌릴 수 없어요.",
+  "backup.invalid": "이 파일을 읽을 수 없어요. 이 사이트에서 내보낸 백업인지 확인하세요. 현재 데이터는 바뀌지 않았어요.",
+  "backup.exported": "백업을 내보냈어요",
+  "backup.restored": "백업을 가져왔어요"
 };

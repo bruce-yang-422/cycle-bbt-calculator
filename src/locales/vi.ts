@@ -279,5 +279,15 @@ export default {
   "privacy.changesTitle": "Thay đổi chính sách",
   "privacy.changes": "Nếu chính sách này thay đổi, chúng tôi sẽ cập nhật ngày hiệu lực trên trang này và mô tả các thay đổi quan trọng tại đây.",
   "privacy.contactTitle": "Liên hệ",
-  "privacy.contact": "Mọi thắc mắc về quyền riêng tư, hãy liên hệ qua GitHub Issues."
+  "privacy.contact": "Mọi thắc mắc về quyền riêng tư, hãy liên hệ qua GitHub Issues.",
+  "backup.title": "Sao lưu dữ liệu",
+  "backup.intro": "Xuất mọi ghi chép và cài đặt thành tệp CSV, rồi nhập trên thiết bị hoặc trình duyệt khác để khôi phục.",
+  "backup.export": "Xuất bản sao lưu",
+  "backup.import": "Nhập bản sao lưu",
+  "backup.warn": "Tệp sao lưu chứa ghi chép sức khỏe của bạn. Hãy giữ kín.",
+  "backup.filename": "sao-luu-chu-ky-nhiet-do",
+  "backup.confirm": "Thay toàn bộ ghi chép hiện tại bằng bản sao lưu này?\n{periods} kỳ kinh, {temps} nhiệt độ, {unprotected} ghi chép không bảo vệ.\nKhông thể hoàn tác.",
+  "backup.invalid": "Không đọc được tệp này. Hãy chắc rằng đây là bản sao lưu xuất từ trang này. Dữ liệu hiện tại không thay đổi.",
+  "backup.exported": "Đã xuất bản sao lưu",
+  "backup.restored": "Đã nhập bản sao lưu"
 };

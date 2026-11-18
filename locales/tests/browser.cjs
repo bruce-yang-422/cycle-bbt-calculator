@@ -146,6 +146,34 @@ async function checkInfo(page, origin) {
   await page.keyboard.press('Escape');
 }
 
+async function checkBackup(page) {
+  const snapshot = () => page.evaluate(() => ['cycleSettings', 'periodHistory', 'bbtData', 'unprotectedLog', 'audienceMode']
+    .map((key) => localStorage.getItem(key)).map((value) => (value === '[]' ? null : value)));
+  await goTo(page, 'emergency');
+  await page.locator('#languageSelect').selectOption('ja');
+  const before = await snapshot();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#backupExport').click()]);
+  assert.match(download.suggestedFilename(), /^ja_.+_\d{4}-\d{2}-\d{2}\.csv$/);
+  const file = await download.path();
+  assert(fs.readFileSync(file, 'utf8').startsWith('﻿record,key,value'));
+
+  // Wipe the records, then restore them from the exported file.
+  await page.evaluate(() => ['cycleSettings', 'periodHistory', 'bbtData', 'unprotectedLog'].forEach((key) => localStorage.removeItem(key)));
+  await page.locator('#languageSelect').selectOption('en');
+  page.once('dialog', (dialog) => dialog.accept());
+  await Promise.all([page.waitForEvent('load'), page.locator('#backupFile').setInputFiles(file)]);
+  assert.deepEqual(await snapshot(), before);
+  assert.equal(await page.locator('html').getAttribute('lang'), 'ja');
+  assert.equal(await page.locator('#toast').textContent().then((text) => text.trim()), catalogs.ja['backup.restored']);
+
+  // A damaged file is rejected and nothing changes.
+  await goTo(page, 'emergency');
+  await page.locator('#backupFile').setInputFiles({ name: 'broken.csv', mimeType: 'text/csv', buffer: Buffer.from('record,key,value\nbbt,2026-01-01,99\n') });
+  await page.waitForFunction((text) => document.getElementById('toast')?.textContent?.includes(text), catalogs.ja['backup.invalid']);
+  assert.deepEqual(await snapshot(), before);
+  await page.locator('#languageSelect').selectOption('en');
+}
+
 async function checkPeriodShortcut(page) {
   const settings = () => page.evaluate(() => JSON.parse(localStorage.getItem('cycleSettings')).values.lastPeriod);
   const before = await settings();
@@ -483,6 +511,7 @@ async function main() {
     await checkShare(page);
     await checkUnprotected(page);
     await checkInfo(page, origin);
+    await checkBackup(page);
 
     await context.setOffline(false);
     await page.goto(origin + '/404.html?lang=ja', { waitUntil: 'domcontentloaded' });
