@@ -62,7 +62,9 @@ npm run build
 npm run preview
 ```
 
-建置會將專案根目錄的 `CNAME`、Google 驗證檔、`robots.txt` 和 `sitemap.xml` 原樣複製到 `dist/`。正式站使用 GitHub Pages，發佈來源設為 **GitHub Actions**。`main` 更新時，[`pages.yml`](.github/workflows/pages.yml) 會安裝依賴、執行測試、建置並發佈 `dist/`。若部署到其他靜態主機，將 `dist/` 的內容放到網域根目錄。
+建置會將專案根目錄的 `CNAME`、Google 驗證檔、`robots.txt` 和 `sitemap.xml` 原樣複製到 `dist/`。正式站由 GitHub Pages 發佈 `gh-pages` 分支的根目錄。發佈新版時，從 `main` 執行 `npm run build`，將 `dist/` 的內容發佈到 `gh-pages`，並保留該分支根目錄的 `.nojekyll`。
+
+若將 Pages 的來源切換成 GitHub Actions，可手動執行 [Deploy to GitHub Pages](.github/workflows/pages.yml)。它會安裝依賴、執行測試、建置並發佈 `dist/`。
 
 ## 核心邏輯
 
