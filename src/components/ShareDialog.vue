@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onUnmounted, ref, shallowRef } from 'vue'
-import { NButton } from 'naive-ui'
+import AppIcon from './AppIcon.vue'
 import type { AudienceMode } from '../audience'
 import type { useCycle } from '../useCycle'
 import { t } from '../i18n'
@@ -43,6 +43,9 @@ async function open() {
   }
   const request = ++generation
   try {
+    // Web fonts must be ready before canvas text, or the export falls back to system glyphs.
+    await document.fonts?.ready
+    if (request !== generation) return
     const canvas = drawShareImage(result)
     const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'))
     if (request !== generation) return
@@ -106,25 +109,25 @@ defineExpose({ open })
 </script>
 
 <template>
-  <dialog id="shareDialog" ref="dialog" class="share-dialog" aria-labelledby="shareTitle" @close="restoreFocus">
-    <div class="share-heading">
-      <h2 id="shareTitle">{{ t('share.open') }}</h2>
-      <NButton id="shareClose" text :aria-label="t('close')" @click="dialog?.close()">×</NButton>
+  <dialog id="shareDialog" ref="dialog" class="modal share-dialog" aria-labelledby="shareTitle" @close="restoreFocus">
+    <div class="modal-head">
+      <h2 id="shareTitle" class="modal-title">{{ t('share.open') }}</h2>
+      <button id="shareClose" type="button" class="icon-btn" :aria-label="t('close')" @click="dialog?.close()"><AppIcon name="close" /></button>
     </div>
     <p class="share-note">{{ t('share.scope') }}</p>
-    <div class="share-switch">
-      <NButton id="shareImageTab" :aria-pressed="view === 'image'" @click="setView('image')">{{ t('share.image') }}</NButton>
-      <NButton id="shareTextTab" :aria-pressed="view === 'text'" @click="setView('text')">{{ t('share.text') }}</NButton>
+    <div class="segmented">
+      <button id="shareImageTab" type="button" class="segment" :class="{ on: view === 'image' }" :aria-pressed="view === 'image'" @click="setView('image')">{{ t('share.image') }}</button>
+      <button id="shareTextTab" type="button" class="segment" :class="{ on: view === 'text' }" :aria-pressed="view === 'text'" @click="setView('text')">{{ t('share.text') }}</button>
     </div>
     <div id="shareImagePanel" :class="{ hidden: view !== 'image' }">
       <img v-if="url" id="sharePreview" :src="url" :alt="t('summary')">
-      <NButton id="shareDownload" class="btn-outline" block @click="download">{{ t('share.download') }}</NButton>
+      <button id="shareDownload" type="button" class="btn btn-ghost btn-block" @click="download"><AppIcon name="download" :size="17" />{{ t('share.download') }}</button>
     </div>
     <div id="shareTextPanel" :class="{ hidden: view !== 'text' }">
       <textarea id="sharePlainText" ref="textArea" :value="text" readonly :aria-label="t('share.text')"></textarea>
-      <NButton id="shareCopy" class="btn-outline" block @click="copy">{{ t('share.copy') }}</NButton>
+      <button id="shareCopy" type="button" class="btn btn-ghost btn-block" @click="copy">{{ t('share.copy') }}</button>
     </div>
-    <NButton id="shareNative" class="btn-primary" type="primary" block @click="send">{{ t('share.send') }}</NButton>
+    <button id="shareNative" type="button" class="btn btn-primary btn-lg" @click="send"><AppIcon name="share" :size="18" />{{ t('share.send') }}</button>
     <p id="shareFeedback" class="share-note" role="status">{{ feedback }}</p>
   </dialog>
 </template>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue';
-import { NButton } from 'naive-ui';
 import { t } from '../i18n';
 
 defineProps<{ blocked?: boolean }>();
@@ -144,38 +143,36 @@ onUnmounted(() => {
         <div class="install-sub">{{ t(!deferredPrompt && ios ? 'install.ios' : 'install.sub') }}</div>
       </div>
       <div class="install-actions">
-        <NButton id="installBtn" class="install-btn" data-control="control-1" type="primary" round :disabled="installInProgress" @click="handleInstallClick">
+        <button id="installBtn" type="button" class="btn btn-primary btn-sm install-btn" data-control="control-1" :disabled="installInProgress" @click="handleInstallClick">
           {{ t('install.button') }}
-        </NButton>
-        <NButton id="installCloseBtn" class="install-close" data-control="control-2" text :aria-label="t('close')" @click="dismissBanner">
-          ✕
-        </NButton>
+        </button>
+        <button id="installCloseBtn" type="button" class="icon-btn install-close" data-control="control-2" :aria-label="t('close')" @click="dismissBanner">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+        </button>
       </div>
     </div>
   </Teleport>
 
   <footer ref="footer" class="app-footer">
     <p>{{ t('footer') }}</p>
-    <NButton
+    <button
       id="appInstallEntry"
-      class="app-install-entry"
+      type="button"
+      class="btn btn-ghost btn-sm app-install-entry"
       :class="{ hidden: entryHidden }"
       data-control="control-19"
       aria-controls="installHelp"
       :aria-expanded="helpVisible"
       :disabled="installInProgress"
-      round
       @click="handleInstallClick"
     >
-      <template #icon>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>
-      </template>
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg>
       {{ t('install.button') }}
-    </NButton>
+    </button>
   </footer>
   <section id="installHelp" ref="help" class="install-help" :class="{ hidden: !helpVisible }" aria-labelledby="installHelpTitle">
     <strong id="installHelpTitle">{{ t('install.title') }}</strong>
     <p id="installHelpText">{{ t(ios ? 'install.ios' : 'install.other') }}</p>
-    <NButton class="layout-18 today-btn" data-control="control-20" @click="closeHelp">{{ t('install.hide') }}</NButton>
+    <button type="button" class="chip" data-control="control-20" @click="closeHelp">{{ t('install.hide') }}</button>
   </section>
 </template>

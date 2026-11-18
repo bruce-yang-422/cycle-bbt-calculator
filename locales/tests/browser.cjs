@@ -100,6 +100,58 @@ async function checkLocalizedPages(page) {
   assert.deepEqual(await cycleSnapshot(page), before);
 }
 
+async function checkPeriodShortcut(page) {
+  const settings = () => page.evaluate(() => JSON.parse(localStorage.getItem('cycleSettings')).values.lastPeriod);
+  const before = await settings();
+  await page.locator('[data-control="control-14"]').click();
+  assert.equal(await settings(), '2026-01-31');
+  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('periodHistory')).length), 1);
+  assert.match(await page.locator('#calGrid button[data-date="2026-01-31"]').getAttribute('class'), /\bperiod\b/);
+  await page.locator('#toast .toast-action').click();
+  assert.equal(await settings(), before);
+  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('periodHistory')).length), 0);
+}
+
+async function checkUnprotected(page) {
+  await goTo(page, 'emergency');
+  await page.locator('#languageSelect').selectOption('en');
+  await page.locator('#audienceSelect').selectOption('contraception');
+  await goTo(page, 'calendar');
+  await page.locator('[data-control="control-34"]').click();
+  await page.locator('#unprotectedDialog').waitFor({ state: 'visible' });
+
+  await page.locator('#uDate').fill('2026-02-05');
+  await page.locator('#unpSave').click();
+  assert.equal(await page.locator('#uDateError').textContent(), catalogs.en['error.future']);
+
+  // 72 hours from Jan 28 ends today (Jan 31); the 5-day windows are still open.
+  await page.locator('#uDate').fill('2026-01-28');
+  const deadlines = await page.locator('.unp-deadline').allTextContents();
+  assert.equal(deadlines[0].trim(), catalogs.en['unp.lastDay']);
+  assert.notEqual(deadlines[1].trim(), catalogs.en['unp.expired']);
+  await page.locator('#unpSave').click();
+  await page.locator('#unprotectedDialog').waitFor({ state: 'hidden' });
+  assert((await page.locator('#unpReminder').innerText()).includes(catalogs.en['unp.cardEc']));
+  await page.locator('[data-control="control-13"]').click();
+  assert.equal(await page.locator('#calGrid [data-date="2026-01-28"] .cell-unp').count(), 1);
+  assert.deepEqual(JSON.parse(await page.evaluate(() => localStorage.getItem('unprotectedLog'))), ['2026-01-28']);
+
+  // Other purposes never see the feature or its markers.
+  for (const mode of ['tracking', 'conception']) {
+    await goTo(page, 'emergency');
+    await page.locator('#audienceSelect').selectOption(mode);
+    await goTo(page, 'calendar');
+    assert.equal(await page.locator('[data-control="control-34"], #unpReminder, .cell-unp').count(), 0, mode);
+  }
+
+  await goTo(page, 'emergency');
+  await page.locator('#audienceSelect').selectOption('contraception');
+  await goTo(page, 'calendar');
+  await page.locator('#unpReminder').click();
+  await page.locator('#unpRemove').click();
+  assert.equal(await page.locator('#unpReminder').count(), 0);
+}
+
 async function checkDraftAndRecords(page) {
   await goTo(page, 'calendar');
   await page.locator('.setup-btn').click();
@@ -350,11 +402,13 @@ async function main() {
     await page.locator('#audienceDialog').waitFor({ state: 'visible' });
     await page.locator('#initialLanguage').selectOption('de');
     assert.equal(await page.locator('html').getAttribute('lang'), 'de');
-    await page.locator('#initialAudience').selectOption('conception');
-    await page.locator('#audienceDialog button[type="submit"]').click();
+    await page.locator('#audienceDialog [data-mode="conception"]').click();
+    await page.locator('#audienceDialog').waitFor({ state: 'hidden' });
+    assert.equal(await page.evaluate(() => localStorage.getItem('audienceMode')), 'conception');
     await page.locator('#startCard button').click();
     await page.locator('#lastPeriod').fill('2026-01-01');
     await page.locator('[data-control="control-30"]').click();
+    await checkPeriodShortcut(page);
     await page.locator('#calGrid button[data-date="2026-01-14"]').click();
 
     await checkLocalizedPages(page);
@@ -362,6 +416,7 @@ async function main() {
     await checkRegion(page);
     await checkOffline(context, page);
     await checkShare(page);
+    await checkUnprotected(page);
 
     await context.setOffline(false);
     await page.goto(origin + '/404.html?lang=ja', { waitUntil: 'domcontentloaded' });

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { NButton, NCard } from 'naive-ui'
+import AppIcon from './AppIcon.vue'
 import { audienceModes, isAudienceMode, type AudienceMode } from '../audience'
 import { language, languageNames, setLanguage, supportedLanguages, t, type TranslationKey } from '../i18n'
 import { guideEmphasis } from '../locales/guide-emphasis'
@@ -128,50 +128,55 @@ onMounted(() => {
 
 <template>
   <section id="page-emergency" class="page">
-    <h2 class="section-title">{{ t('settings.title') }}</h2>
-    <p class="page-intro">{{ t('guide.subtitle') }}</p>
+    <div class="page-head">
+      <h2 class="section-title"><span class="title-icon"><AppIcon name="settings" /></span>{{ t('settings.title') }}</h2>
+      <p class="page-intro">{{ t('guide.subtitle') }}</p>
+    </div>
 
-    <NCard class="settings-card" content-style="padding: 0">
-      <h3 class="settings-help-title preferences-title">{{ t('settings.preferences') }}</h3>
-      <div class="settings-preferences">
-        <div class="audience-picker">
+    <div class="page-columns">
+    <div>
+    <div class="card settings-card">
+      <h3 class="card-title">{{ t('settings.preferences') }}</h3>
+      <div class="settings-rows">
+        <div class="setting-row">
           <label for="languageSelect">{{ t('language') }}</label>
-          <select id="languageSelect" class="audience-select language-select" :value="language" @change="changeLanguage">
+          <select id="languageSelect" class="pill-select" :value="language" @change="changeLanguage">
             <option v-for="code in supportedLanguages" :key="code" :value="code" :lang="code">{{ languageNames[code] }}</option>
           </select>
         </div>
-        <div class="audience-picker">
+        <div class="setting-row">
           <label for="audienceSelect">{{ t('purpose') }}</label>
-          <select id="audienceSelect" class="audience-select" :value="audience" @change="changeAudience">
+          <select id="audienceSelect" class="pill-select" :value="audience" @change="changeAudience">
             <option v-for="mode in audienceModes" :key="mode" :value="mode">{{ t(`mode.${mode}`) }}</option>
           </select>
         </div>
-      </div>
-
-      <div class="region-settings">
-        <label for="regionSelect">{{ t('region.label') }}</label>
-        <select id="regionSelect" :value="regionPreference" aria-describedby="regionStatus" @change="changeRegion">
+        <div class="setting-row">
+          <label for="regionSelect">{{ t('region.label') }}</label>
+          <select id="regionSelect" class="pill-select" :value="regionPreference" aria-describedby="regionStatus" @change="changeRegion">
           <option value="auto">{{ t('region.auto') }}</option>
           <option value="TW">{{ t('region.taiwan') }}</option>
-          <option value="global">{{ t('region.global') }}</option>
-        </select>
-        <small id="regionStatus" role="status">{{ regionStatus }}</small>
+            <option value="global">{{ t('region.global') }}</option>
+          </select>
+        </div>
+        <small id="regionStatus" class="setting-status" role="status">{{ regionStatus }}</small>
       </div>
 
-      <div class="settings-privacy"><span class="privacy-badge">{{ t('privacy') }}</span></div>
+      <p class="privacy-badge"><AppIcon name="lock" :size="15" />{{ t('privacy') }}</p>
       <div class="settings-reset">
         <p id="resetDescription">{{ t('reset.description') }}</p>
-        <NButton id="resetAllBtn" class="btn-outline" type="error" ghost block aria-describedby="resetDescription" @click="emit('reset')">
-          {{ t('reset.button') }}
-        </NButton>
+        <button id="resetAllBtn" type="button" class="btn btn-danger-ghost" aria-describedby="resetDescription" @click="emit('reset')">
+          <AppIcon name="trash" :size="17" />{{ t('reset.button') }}
+        </button>
       </div>
-    </NCard>
+    </div>
+    </div>
 
-    <h3 id="purposeGuideTitle" class="settings-help-title">{{ t(plan.title) }}</h3>
+    <div class="guide-column">
+    <h3 id="purposeGuideTitle" class="block-title">{{ t(plan.title) }}</h3>
     <p id="helpIntro" class="page-intro">{{ t(`${audience}.hint`) }}</p>
     <div id="purposeGuide">
       <template v-for="group in guideSections" :key="group.kind">
-        <h4 v-if="group.kind === 'faq'" class="settings-help-title">{{ t('guide.faq') }}</h4>
+        <h4 v-if="group.kind === 'faq'" class="block-title faq-title">{{ t('guide.faq') }}</h4>
         <component
           :is="group.kind === 'faq' ? 'details' : 'div'"
           v-for="entry in group.entries"
@@ -181,7 +186,8 @@ onMounted(() => {
           :data-question="group.kind === 'faq' ? entry.heading : undefined"
         >
           <component :is="group.kind === 'faq' ? 'summary' : 'h4'" :class="group.kind === 'cards' ? 'emrg-title' : undefined">
-            {{ t(entry.heading) }}
+            <span>{{ t(entry.heading) }}</span>
+            <AppIcon v-if="group.kind === 'faq'" class="faq-chevron" name="down" :size="18" />
           </component>
           <div>
             <p>
@@ -190,7 +196,7 @@ onMounted(() => {
                 <template v-else>{{ segment.text }}</template>
               </template>
             </p>
-            <a v-if="entry.source" :href="entry.source">{{ t('help.source') }}</a>
+            <a v-if="entry.source" class="source-link" :href="entry.source" target="_blank" rel="noopener noreferrer">{{ t('help.source') }}</a>
           </div>
         </component>
       </template>
@@ -200,20 +206,11 @@ onMounted(() => {
       <h4 class="emrg-title">{{ t('tw.title') }}</h4>
       <p id="taiwanPurpose">{{ t(`tw.${audience}`) }}</p>
       <p>{{ t('tw.support') }}</p>
-      <a href="https://www.immigration.gov.tw/5385/7445/7910/204893/" target="_blank" rel="noopener noreferrer">{{ t('tw.source') }}</a>
+      <a class="source-link" href="https://www.immigration.gov.tw/5385/7445/7910/204893/" target="_blank" rel="noopener noreferrer">{{ t('tw.source') }}</a>
     </div>
-    <div class="disclaimer-box">{{ t('help.note') }}</div>
+    <p class="fine-print">{{ t('help.note') }}</p>
+    </div>
+    </div>
   </section>
 </template>
 
-<style scoped>
-#page-emergency .preferences-title {
-  margin: 0 0 16px;
-  color: var(--text-sub);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: .08em;
-}
-</style>

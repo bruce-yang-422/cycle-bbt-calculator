@@ -15,6 +15,7 @@ interface SharedRow {
 }
 
 interface ShareResult {
+  audience: AudienceMode
   startDate: string
   days: SharedDay[]
   rows: SharedRow[]
@@ -29,11 +30,13 @@ interface ShareResult {
 }
 
 const shareColors = {
-  period: ['#f5d2df', '#88435d'],
-  fertile: ['#fae5c5', '#885912'],
-  ovulation: ['#f5c4bf', '#9d302e'],
-  safe: ['#dfede4', '#32664a'],
+  period: ['#f8d3de', '#9b3a5b'],
+  fertile: ['#ffe4d2', '#91461d'],
+  ovulation: ['#e8dcfa', '#5d409f'],
+  safe: ['#e3f1e9', '#2c684c'],
 } satisfies Record<DayStatus, [string, string]>
+
+const lowNeutral: [string, string] = ['#f1ebe5', '#67574d']
 
 function shareDate(iso: string, full = false) {
   return localizedDate(new Date(iso + 'T00:00:00'), {
@@ -125,6 +128,7 @@ export function buildShareResult(
     'ℹ️ ' + note,
   ].join('\n')
   return {
+    audience,
     startDate,
     days,
     rows,
@@ -139,14 +143,23 @@ export function buildShareResult(
   }
 }
 
+const ink = '#3e2f36'
+const muted = '#75626b'
+const faint = '#a08f96'
+
 export function drawShareImage(result: ShareResult): HTMLCanvasElement {
   const canvas = document.createElement('canvas')
   canvas.width = 1080
   canvas.height = 1620
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas unavailable')
+  // Reuse the page's language-specific font stack so the export matches the app.
+  // Contraception mode shows lower-risk days in neutral oat, matching the app.
+  const colorOf = (status: DayStatus) =>
+    status === 'safe' && result.audience === 'contraception' ? lowNeutral : shareColors[status]
   const font =
-    '"Huninn", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif'
+    getComputedStyle(document.body).fontFamily ||
+    '"Plus Jakarta Sans", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif'
   const box = (
     x: number,
     y: number,
@@ -165,7 +178,7 @@ export function drawShareImage(result: ShareResult): HTMLCanvasElement {
     x: number,
     y: number,
     size = 28,
-    color = '#51464b',
+    color = ink,
     weight = 400,
     maxWidth?: number,
   ) => {
@@ -198,11 +211,27 @@ export function drawShareImage(result: ShareResult): HTMLCanvasElement {
     if (line) lines.push(line)
     return lines
   }
-  box(0, 0, 1080, 1620, 0, '#faf7f5')
+  box(0, 0, 1080, 1620, 0, '#fbf6f4')
+  const glow = (x: number, y: number, r: number, color: string) => {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+    g.addColorStop(0, color)
+    g.addColorStop(1, 'rgba(251, 246, 244, 0)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 1080, 1620)
+  }
+  glow(0, 0, 760, '#fde3ea')
+  glow(1080, 60, 640, '#eee5fb')
+  glow(540, 1700, 620, '#fdeee6')
   // The complete calendar occupies the upper 1080 × 1080 square.
-  box(30, 30, 1020, 1020, 30, '#ffffff')
-  text(result.title, 64, 60, 38, '#513f48', 600, 950)
-  text(result.range, 64, 116, 28, '#76616c', 400, 950)
+  ctx.save()
+  ctx.shadowColor = 'rgba(200, 110, 140, .14)'
+  ctx.shadowBlur = 40
+  ctx.shadowOffsetY = 12
+  box(30, 30, 1020, 1020, 36, '#ffffff')
+  ctx.restore()
+  box(64, 62, 8, 38, 4, '#d9668a')
+  text(result.title, 86, 60, 38, ink, 700, 928)
+  text(result.range, 64, 116, 28, muted, 500, 950)
   const offset = new Date(result.startDate + 'T00:00:00').getDay()
   const rows = Math.ceil((offset + result.days.length) / 7),
     gap = 8,
@@ -212,22 +241,22 @@ export function drawShareImage(result: ShareResult): HTMLCanvasElement {
     const weekday = localizedDate(new Date(2026, 0, 4 + col), {
       weekday: 'short',
     })
-    text(weekday, 64 + col * 136, 181, 23, '#76616c', 400, 120)
+    text(weekday, 64 + col * 136, 181, 23, col === 0 || col === 6 ? '#d9668a' : faint, 600, 120)
   }
   result.days.forEach((day, i) => {
     const slot = offset + i,
       x = 64 + (slot % 7) * 136,
       y = 225 + Math.floor(slot / 7) * (cellH + gap)
     const info = day.info,
-      [bg, fg] = shareColors[info.status]
-    box(x, y, cellW, cellH, 15, bg)
+      [bg, fg] = colorOf(info.status)
+    box(x, y, cellW, cellH, 20, bg)
     // Every date includes its month so month/year boundaries are unambiguous.
-    text(shareDate(day.iso), x + 12, y + cellH * 0.32, 27, fg, 500, 104)
+    text(shareDate(day.iso), x + 14, y + cellH * 0.32, 27, fg, 600, 104)
     if (info.isRecordedStart) {
       ctx.strokeStyle = fg
       ctx.lineWidth = 3
       ctx.beginPath()
-      ctx.roundRect(x + 2, y + 2, cellW - 4, cellH - 4, 13)
+      ctx.roundRect(x + 2, y + 2, cellW - 4, cellH - 4, 18)
       ctx.stroke()
     }
     if (info.status === 'period' && info.isFertileWindow)
@@ -236,19 +265,19 @@ export function drawShareImage(result: ShareResult): HTMLCanvasElement {
   result.rows.forEach((row, i) => {
     const x = 64 + (i % 2) * 480,
       y = 971 + Math.floor(i / 2) * 34
-    box(x, y + 3, 16, 16, 5, shareColors[row.color][0])
-    text(row.label, x + 26, y, 22, '#66535d', 400, 437)
+    box(x, y + 4, 16, 16, 5, colorOf(row.color)[1])
+    text(row.label, x + 26, y, 22, muted, 500, 437)
   })
-  text(result.summary, 64, 1090, 32, '#513f48', 600, 950)
-  text(result.mode, 64, 1132, 23, '#76616c', 400, 950)
+  text(result.summary, 64, 1090, 32, ink, 700, 950)
+  text(result.mode, 64, 1132, 23, muted, 500, 950)
   // Four compact cards retain the full dates while fitting the 2:3 export.
   result.rows.forEach((row, i) => {
     const x = 64 + (i % 2) * 484,
       y = 1170 + Math.floor(i / 2) * 151,
       w = 468,
       h = 137
-    const [bg, fg] = shareColors[row.color]
-    box(x, y, w, h, 20, bg)
+    const [bg, fg] = colorOf(row.color)
+    box(x, y, w, h, 24, bg)
     box(x + 19, y + 23, 9, 9, 4, fg)
     const labels = wrap(row.label, w - 65, 22)
     let size = 30,
@@ -285,7 +314,7 @@ export function drawShareImage(result: ShareResult): HTMLCanvasElement {
   let y = 1482
   for (const paragraph of wrapped) {
     for (const line of paragraph) {
-      text(line, 64, y, size, '#76616c')
+      text(line, 64, y, size, muted)
       y += size * 1.5
     }
     y += 7

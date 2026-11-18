@@ -5,7 +5,7 @@ type StorageWriter = Pick<Storage, 'setItem'>;
 
 export const appStorageKeys = [
   'periodHistory', 'bbtData', 'cycleSettings', 'audienceMode', 'language',
-  'regionPreference', 'installBannerDismissed',
+  'regionPreference', 'installBannerDismissed', 'unprotectedLog',
 ] as const;
 
 export type CycleField = 'lastPeriod' | 'cycleLength' | 'minLength' | 'maxLength' | 'periodLength';
@@ -24,6 +24,18 @@ function readJSON(key: string, storage?: StorageReader): unknown {
   } catch {
     return null;
   }
+}
+
+/** Dates of unprotected sex or contraceptive failure, newest first. */
+export function getUnprotected(storage?: StorageReader): string[] {
+  const entries = readJSON('unprotectedLog', storage);
+  if (!Array.isArray(entries)) return [];
+  return [...new Set(entries.filter((date): date is string => typeof date === 'string' && isISODate(date)))]
+    .sort((a, b) => b.localeCompare(a));
+}
+
+export function saveUnprotected(dates: readonly string[], storage?: StorageWriter): void {
+  (storage ?? globalThis.localStorage).setItem('unprotectedLog', JSON.stringify(dates));
 }
 
 export function getHistory(storage?: StorageReader): HistoryEntry[] {

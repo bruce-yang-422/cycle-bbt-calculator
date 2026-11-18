@@ -1,6 +1,7 @@
 import { t } from './i18n'
 
-export const audienceModes = ['tracking', 'contraception', 'conception'] as const
+// Contraception leads: it is the most common reason people open the app.
+export const audienceModes = ['contraception', 'tracking', 'conception'] as const
 export type AudienceMode = (typeof audienceModes)[number]
 
 export function isAudienceMode(value: unknown): value is AudienceMode {

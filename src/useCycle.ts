@@ -4,7 +4,7 @@ import {
   type BBTReading, type CycleDayMap, type CycleParams, type CycleType, type DayInfo, type HistoryRecord,
 } from './cycle';
 import {
-  getBBT, getHistory, readCycleSettings, saveBBT, saveCycleSettings, saveHistoryData,
+  getBBT, getHistory, getUnprotected, readCycleSettings, saveBBT, saveCycleSettings, saveHistoryData, saveUnprotected,
   type CycleField, type CycleSettings,
 } from './storage';
 
@@ -16,10 +16,10 @@ export interface CycleDraft extends Record<NumberField, string> {
   lastPeriod: string;
 }
 
-export type ActionField = CycleField | 'hDate' | 'bbtDate' | 'bbtTemp';
+export type ActionField = CycleField | 'hDate' | 'bbtDate' | 'bbtTemp' | 'uDate';
 type ErrorKey = 'error.date' | 'error.future' | 'error.duplicate' | 'error.range' | 'error.order'
   | 'error.temp' | 'error.storage' | 'error.unsupported' | 'setupFirst';
-type SuccessKey = 'saved' | 'updated' | 'deleted' | 'error.storage';
+type SuccessKey = 'saved' | 'updated' | 'deleted' | 'error.storage' | 'action.periodDone' | 'unp.saved';
 
 interface ActionError {
   ok: false;
@@ -88,7 +88,7 @@ function snapshot(draft: CycleDraft): CycleSettings {
   };
 }
 
-function validateRecordDate(date: string, today: string, field: 'bbtDate' | 'hDate'): ActionError | undefined {
+function validateRecordDate(date: string, today: string, field: 'bbtDate' | 'hDate' | 'uDate'): ActionError | undefined {
   if (!isISODate(date)) return { ok: false, key: 'error.date', field };
   if (date > today) return { ok: false, key: 'error.future', field };
 }
@@ -106,6 +106,7 @@ export function useCycle(storage?: Pick<Storage, 'getItem' | 'setItem'>) {
   const calcParams = ref<CycleParams | null>(initialPrediction?.ok ? initialPrediction.params : null);
   const history = ref(getHistory(storage));
   const bbt = ref(getBBT(storage));
+  const unprotected = ref(getUnprotected(storage));
   const selectedDate = ref(today.value);
   const calYear = ref(new Date(`${today.value}T00:00:00`).getFullYear());
   const calMonth = ref(new Date(`${today.value}T00:00:00`).getMonth());
@@ -251,6 +252,57 @@ export function useCycle(storage?: Pick<Storage, 'getItem' | 'setItem'>) {
     return result.ok ? result : { ok: false, key: result.key };
   }
 
+  /** One-tap "my period started": logs the date and re-anchors the prediction on it. */
+  function startPeriod(date: string = localISO(new Date())): { result: ActionResult; undo?: () => void } {
+    today.value = localISO(new Date());
+    const invalid = validateRecordDate(date, today.value, 'hDate');
+    if (invalid) return { result: invalid };
+    const previous = appliedSettings.value;
+    if (!previous) {
+      draft.lastPeriod = date;
+      return { result: { ok: false, key: 'setupFirst' } };
+    }
+
+    history.value = getHistory(storage);
+    const addsRecord = !history.value.some(record => record.date === date);
+    if (addsRecord) {
+      const failed = persistHistory([...history.value, { date }]);
+      if (failed) return { result: failed };
+    }
+    Object.assign(draft, { type: previous.type, ...previous.values, lastPeriod: date });
+    const applied = applySettings();
+    if (!applied.ok) return { result: applied };
+
+    const undo = () => {
+      if (addsRecord) deleteHistory(date);
+      Object.assign(draft, { type: previous.type, ...previous.values });
+      applySettings();
+    };
+    return { result: { ok: true, key: applied.key === 'error.storage' ? 'error.storage' : 'action.periodDone' }, undo };
+  }
+
+  function persistUnprotected(dates: string[], key: 'unp.saved' | 'deleted'): ActionResult {
+    const sorted = [...new Set(dates)].sort((a, b) => b.localeCompare(a));
+    try {
+      saveUnprotected(sorted, storage);
+    } catch {
+      return { ok: false, key: 'error.storage' };
+    }
+    unprotected.value = sorted;
+    return { ok: true, key };
+  }
+
+  function addUnprotected(date: string): ActionResult {
+    today.value = localISO(new Date());
+    const invalid = validateRecordDate(date, today.value, 'uDate');
+    if (invalid) return invalid;
+    return persistUnprotected([...getUnprotected(storage), date], 'unp.saved');
+  }
+
+  function deleteUnprotected(date: string): ActionResult {
+    return persistUnprotected(getUnprotected(storage).filter(day => day !== date), 'deleted');
+  }
+
   function persistBBT(records: BBTReading[], key: 'saved' | 'updated' | 'deleted'): ActionResult {
     try {
       saveBBT(records, storage);
@@ -290,8 +342,8 @@ export function useCycle(storage?: Pick<Storage, 'getItem' | 'setItem'>) {
   }
 
   return {
-    draft, appliedSettings, calcParams, dayMap, selectedDate, calYear, calMonth, history, historyStats, bbt,
+    today, draft, appliedSettings, calcParams, dayMap, selectedDate, calYear, calMonth, history, historyStats, bbt, unprotected,
     bbtAnalysis, overview, selectedDay, calendarCells, applySettings, autoFill, selectDate, moveMonth, goToday,
-    addHistory, deleteHistory, saveCurrentCycle, addBBT, deleteBBT, clearBBT,
+    addHistory, deleteHistory, saveCurrentCycle, startPeriod, addBBT, deleteBBT, clearBBT, addUnprotected, deleteUnprotected,
   };
 }

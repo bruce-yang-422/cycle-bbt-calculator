@@ -14,7 +14,6 @@
     "test:browser": "npm run build && tsx locales/tests/browser.cjs"
   },
   "dependencies": {
-    "naive-ui": "^2.45.3",
     "vue": "^3.5.45",
     "workbox-precaching": "^7.4.1",
     "workbox-routing": "^7.4.1"

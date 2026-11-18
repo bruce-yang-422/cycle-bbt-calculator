@@ -11,7 +11,9 @@ export function drawBBTChart(
   localizedDate: DateFormatter,
 ): void {
   const scale = window.devicePixelRatio || 1;
-  const width = (canvas.parentElement?.clientWidth ?? 0) - 34;
+  const parent = canvas.parentElement;
+  const box = parent ? getComputedStyle(parent) : null;
+  const width = Math.floor((parent?.clientWidth ?? 0) - parseFloat(box?.paddingLeft ?? '0') - parseFloat(box?.paddingRight ?? '0'));
   const height = 200;
   if (width <= 0) return;
 
@@ -20,6 +22,7 @@ export function drawBBTChart(
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
   const ctx = canvas.getContext('2d');
+  const chartFont = getComputedStyle(canvas).fontFamily || 'system-ui, sans-serif';
   const points = [...data].sort((a, b) => a.date.localeCompare(b.date)).slice(-30);
   if (!ctx || points.length < 2) return;
   ctx.scale(scale, scale);
@@ -33,10 +36,10 @@ export function drawBBTChart(
   const xOf = (index: number) => pad.left + index / (points.length - 1) * graphWidth;
   const yOf = (temp: number) => pad.top + graphHeight - (temp - min) / (max - min) * graphHeight;
 
-  ctx.strokeStyle = '#f0e4e6';
+  ctx.strokeStyle = '#f1e4e7';
   ctx.lineWidth = 0.5;
-  ctx.fillStyle = '#9a8085';
-  ctx.font = '10px system-ui';
+  ctx.fillStyle = '#8a7880';
+  ctx.font = `500 10px ${chartFont}`;
   ctx.textAlign = 'right';
   for (let step = 0; step <= 4; step++) {
     const temp = min + (max - min) * (step / 4);
@@ -51,7 +54,7 @@ export function drawBBTChart(
   const coverLine = result?.coverLine;
   if (coverLine != null && coverLine >= min && coverLine <= max) {
     const y = yOf(coverLine);
-    ctx.strokeStyle = '#e8637a';
+    ctx.strokeStyle = '#d9668a';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 3]);
     ctx.beginPath();
@@ -59,7 +62,7 @@ export function drawBBTChart(
     ctx.lineTo(width - pad.right, y);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#e8637a';
+    ctx.fillStyle = '#b84d70';
     ctx.textAlign = 'left';
     ctx.fillText(formatNumber(coverLine, 2), pad.left + 4, y - 3);
   }
@@ -67,11 +70,23 @@ export function drawBBTChart(
   const today = localISO(new Date());
   const highStart = result?.highTempStartDate;
   const high = ({ date }: BBTReading) => Boolean(highStart && date >= highStart && date <= today);
-  ctx.lineWidth = 2;
+  const area = ctx.createLinearGradient(0, pad.top, 0, height - pad.bottom);
+  area.addColorStop(0, 'rgba(217, 102, 138, .18)');
+  area.addColorStop(1, 'rgba(217, 102, 138, 0)');
+  ctx.beginPath();
+  ctx.moveTo(xOf(0), height - pad.bottom);
+  points.forEach((point, index) => ctx.lineTo(xOf(index), yOf(point.temp)));
+  ctx.lineTo(xOf(points.length - 1), height - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = area;
+  ctx.fill();
+
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
   for (let index = 1; index < points.length; index++) {
     const previous = points[index - 1]!;
     const point = points[index]!;
-    ctx.strokeStyle = high(previous) && high(point) ? '#e74c3c' : '#3d5afe';
+    ctx.strokeStyle = high(previous) && high(point) ? '#d9668a' : '#a58fd6';
     ctx.beginPath();
     ctx.moveTo(xOf(index - 1), yOf(previous.temp));
     ctx.lineTo(xOf(index), yOf(point.temp));
@@ -79,19 +94,22 @@ export function drawBBTChart(
   }
 
   const labelStep = Math.max(1, Math.floor(points.length / 6));
-  ctx.font = '9px system-ui';
+  ctx.font = `500 10px ${chartFont}`;
   ctx.textAlign = 'center';
   points.forEach((point, index) => {
     const x = xOf(index);
     const ovulation = point.date === result?.ovulationDate;
     ctx.beginPath();
-    ctx.arc(x, yOf(point.temp), ovulation ? 5 : 3, 0, Math.PI * 2);
-    ctx.fillStyle = ovulation ? '#7c5cbf' : high(point) ? '#e74c3c' : '#3d5afe';
+    ctx.arc(x, yOf(point.temp), ovulation ? 6 : 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
+    ctx.lineWidth = ovulation ? 3 : 2;
+    ctx.strokeStyle = ovulation ? '#7b5cc4' : high(point) ? '#d9668a' : '#a58fd6';
+    ctx.stroke();
 
     if (index % labelStep === 0 || index === points.length - 1) {
       const date = new Date(`${point.date}T00:00:00`);
-      ctx.fillStyle = '#9a8085';
+      ctx.fillStyle = '#8a7880';
       ctx.fillText(localizedDate(date, { month: 'numeric', day: 'numeric' }), x, height - pad.bottom + 14);
     }
   });
