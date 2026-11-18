@@ -27,6 +27,30 @@ async function add() {
   if (result.key) emit('notice', t(result.key))
 }
 
+const editing = ref<string | null>(null)
+const editDate = ref('')
+const editError = ref<string>()
+
+async function startEdit(day: string) {
+  editing.value = day
+  editDate.value = day
+  editError.value = undefined
+  await nextTick()
+  document.getElementById('hEdit')?.focus()
+}
+
+function saveEdit() {
+  if (!editing.value) return
+  const result = props.cycle.updateHistory(editing.value, editDate.value)
+  if (!result.ok) {
+    editError.value = result.key
+    return
+  }
+  editing.value = null
+  emit('changed')
+  if (result.key) emit('notice', t(result.key))
+}
+
 function remove(day: string) {
   const result = props.cycle.deleteHistory(day)
   if (result.ok) emit('changed')
@@ -60,13 +84,23 @@ function remove(day: string) {
     <div>
       <div id="histListCard" class="card list-card" :class="{ hidden: !history.length }">
         <ul id="histList" class="record-list timeline">
-          <li v-for="entry in history" :key="entry.date" class="record">
+          <li v-for="entry in history" :key="entry.date" class="record" :class="{ editing: editing === entry.date }">
             <span class="timeline-dot" aria-hidden="true"></span>
-            <span class="record-main">
+            <form v-if="editing === entry.date" class="record-edit" novalidate @submit.prevent="saveEdit" @keydown.esc.stop.prevent="editing = null">
+              <EntryField id="hEdit" v-model="editDate" type="date" :label="t('history.date')" :error="editError ? t(editError) : undefined" @update:model-value="editError = undefined" />
+              <div class="record-edit-actions">
+                <button type="button" class="btn btn-ghost btn-sm" @click="editing = null">{{ t('action.cancel') }}</button>
+                <button id="hEditSave" type="submit" class="btn btn-primary btn-sm">{{ t('action.save') }}</button>
+              </div>
+            </form>
+            <span v-else class="record-main">
               <span class="record-date">{{ dateLabel(entry.date) }}</span>
               <span class="record-sub">{{ entry.cycle != null && entry.nextDate ? t('history.interval', { date: dateLabel(entry.nextDate), n: formatNumber(entry.cycle) }) : t('history.wait') }}</span>
             </span>
-            <button type="button" class="icon-btn btn-del" :aria-label="t('delete')" @click="remove(entry.date)"><AppIcon name="close" :size="18" /></button>
+            <template v-if="editing !== entry.date">
+              <button type="button" class="icon-btn btn-del btn-edit" :aria-label="t('action.edit')" @click="startEdit(entry.date)"><AppIcon name="edit" :size="17" /></button>
+              <button type="button" class="icon-btn btn-del" :aria-label="t('delete')" @click="remove(entry.date)"><AppIcon name="close" :size="18" /></button>
+            </template>
           </li>
         </ul>
       </div>

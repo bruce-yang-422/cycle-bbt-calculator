@@ -12,6 +12,7 @@ function setup({ confirm = true, fail = false } = {}) {
     'regionPreference',
     'installBannerDismissed',
     'unprotectedLog',
+    'theme',
   ];
   const data = new Map([...keys, 'unrelatedApp'].map((key) => [key, 'saved']));
   const redirects = [];

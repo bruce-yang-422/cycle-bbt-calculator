@@ -1,8 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { syncLocalizedMetadata } from './i18n'
+import { initTheme } from './theme'
 import '../css/app.css'
 
+initTheme()
 syncLocalizedMetadata()
 createApp(App).mount('#app')
 

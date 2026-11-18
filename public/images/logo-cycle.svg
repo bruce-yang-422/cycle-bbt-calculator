@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <title>週期與體溫</title>
+  <g fill="none" stroke="#bf557c" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M67.6 20.1 A36 36 0 1 0 85.2 44.5" stroke-width="7"/>
+    <path d="M25 66h9c4 0 6-2.5 8.5-5.6S47 55 51 55h5c4 0 6-1.8 8.5-4.6S69 46 73 46" stroke-width="5"/>
+  </g>
+  <path fill="#bf557c" d="M77 21c-2.3 3.6-6.2 7.8-6.2 11.1a6.2 6.2 0 0 0 12.4 0c0-3.3-3.9-7.5-6.2-11.1Z"/>
+  <circle cx="73" cy="46" r="4.4" fill="#9270bb"/>
+</svg>

@@ -22,7 +22,18 @@ export function drawBBTChart(
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
   const ctx = canvas.getContext('2d');
-  const chartFont = getComputedStyle(canvas).fontFamily || 'system-ui, sans-serif';
+  const style = getComputedStyle(canvas);
+  const chartFont = style.fontFamily || 'system-ui, sans-serif';
+  const token = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
+  const c = {
+    grid: token('--line', '#f1e4e7'),
+    label: token('--text-3', '#8a7880'),
+    rose: token('--rose', '#d9668a'),
+    roseText: token('--rose-strong', '#b04a6d'),
+    low: token('--ovul-solid', '#a58fd6'),
+    ovulation: token('--ovul-ink', '#7b5cc4'),
+    dot: token('--surface', '#ffffff'),
+  };
   const points = [...data].sort((a, b) => a.date.localeCompare(b.date)).slice(-30);
   if (!ctx || points.length < 2) return;
   ctx.scale(scale, scale);
@@ -36,9 +47,9 @@ export function drawBBTChart(
   const xOf = (index: number) => pad.left + index / (points.length - 1) * graphWidth;
   const yOf = (temp: number) => pad.top + graphHeight - (temp - min) / (max - min) * graphHeight;
 
-  ctx.strokeStyle = '#f1e4e7';
+  ctx.strokeStyle = c.grid;
   ctx.lineWidth = 0.5;
-  ctx.fillStyle = '#8a7880';
+  ctx.fillStyle = c.label;
   ctx.font = `500 10px ${chartFont}`;
   ctx.textAlign = 'right';
   for (let step = 0; step <= 4; step++) {
@@ -54,7 +65,7 @@ export function drawBBTChart(
   const coverLine = result?.coverLine;
   if (coverLine != null && coverLine >= min && coverLine <= max) {
     const y = yOf(coverLine);
-    ctx.strokeStyle = '#d9668a';
+    ctx.strokeStyle = c.rose;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 3]);
     ctx.beginPath();
@@ -62,7 +73,7 @@ export function drawBBTChart(
     ctx.lineTo(width - pad.right, y);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#b84d70';
+    ctx.fillStyle = c.roseText;
     ctx.textAlign = 'left';
     ctx.fillText(formatNumber(coverLine, 2), pad.left + 4, y - 3);
   }
@@ -86,7 +97,7 @@ export function drawBBTChart(
   for (let index = 1; index < points.length; index++) {
     const previous = points[index - 1]!;
     const point = points[index]!;
-    ctx.strokeStyle = high(previous) && high(point) ? '#d9668a' : '#a58fd6';
+    ctx.strokeStyle = high(previous) && high(point) ? c.rose : c.low;
     ctx.beginPath();
     ctx.moveTo(xOf(index - 1), yOf(previous.temp));
     ctx.lineTo(xOf(index), yOf(point.temp));
@@ -101,15 +112,15 @@ export function drawBBTChart(
     const ovulation = point.date === result?.ovulationDate;
     ctx.beginPath();
     ctx.arc(x, yOf(point.temp), ovulation ? 6 : 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = c.dot;
     ctx.fill();
     ctx.lineWidth = ovulation ? 3 : 2;
-    ctx.strokeStyle = ovulation ? '#7b5cc4' : high(point) ? '#d9668a' : '#a58fd6';
+    ctx.strokeStyle = ovulation ? c.ovulation : high(point) ? c.rose : c.low;
     ctx.stroke();
 
     if (index % labelStep === 0 || index === points.length - 1) {
       const date = new Date(`${point.date}T00:00:00`);
-      ctx.fillStyle = '#8a7880';
+      ctx.fillStyle = c.label;
       ctx.fillText(localizedDate(date, { month: 'numeric', day: 'numeric' }), x, height - pad.bottom + 14);
     }
   });

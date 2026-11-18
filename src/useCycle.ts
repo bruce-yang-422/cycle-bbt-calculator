@@ -16,7 +16,7 @@ export interface CycleDraft extends Record<NumberField, string> {
   lastPeriod: string;
 }
 
-export type ActionField = CycleField | 'hDate' | 'bbtDate' | 'bbtTemp' | 'uDate';
+export type ActionField = CycleField | 'hDate' | 'hEdit' | 'bbtDate' | 'bbtTemp' | 'uDate';
 type ErrorKey = 'error.date' | 'error.future' | 'error.duplicate' | 'error.range' | 'error.order'
   | 'error.temp' | 'error.storage' | 'error.unsupported' | 'setupFirst';
 type SuccessKey = 'saved' | 'updated' | 'deleted' | 'error.storage' | 'action.periodDone' | 'unp.saved';
@@ -88,7 +88,7 @@ function snapshot(draft: CycleDraft): CycleSettings {
   };
 }
 
-function validateRecordDate(date: string, today: string, field: 'bbtDate' | 'hDate' | 'uDate'): ActionError | undefined {
+function validateRecordDate(date: string, today: string, field: 'bbtDate' | 'hDate' | 'hEdit' | 'uDate'): ActionError | undefined {
   if (!isISODate(date)) return { ok: false, key: 'error.date', field };
   if (date > today) return { ok: false, key: 'error.future', field };
 }
@@ -245,6 +245,26 @@ export function useCycle(storage?: Pick<Storage, 'getItem' | 'setItem'>) {
     return persistHistory(history.value.filter(record => record.date !== date)) ?? { ok: true };
   }
 
+  /** Corrects a mistyped start date; if the prediction is anchored on it, the prediction moves too. */
+  function updateHistory(from: string, to: string): ActionResult {
+    today.value = localISO(new Date());
+    const invalid = validateRecordDate(to, today.value, 'hEdit');
+    if (invalid) return invalid;
+    if (from === to) return { ok: true };
+    history.value = getHistory(storage);
+    if (history.value.some(record => record.date === to)) return { ok: false, key: 'error.duplicate', field: 'hEdit' };
+
+    const failed = persistHistory(history.value.map(record => ({ date: record.date === from ? to : record.date })));
+    if (failed) return failed;
+    const applied = appliedSettings.value;
+    if (applied?.values.lastPeriod === from) {
+      Object.assign(draft, { type: applied.type, ...applied.values, lastPeriod: to });
+      const result = applySettings();
+      if (!result.ok) return result;
+    }
+    return { ok: true, key: 'updated' };
+  }
+
   function saveCurrentCycle(): ActionResult {
     const params = calcParams.value;
     if (!params) return { ok: false, key: 'setupFirst' };
@@ -344,6 +364,6 @@ export function useCycle(storage?: Pick<Storage, 'getItem' | 'setItem'>) {
   return {
     today, draft, appliedSettings, calcParams, dayMap, selectedDate, calYear, calMonth, history, historyStats, bbt, unprotected,
     bbtAnalysis, overview, selectedDay, calendarCells, applySettings, autoFill, selectDate, moveMonth, goToday,
-    addHistory, deleteHistory, saveCurrentCycle, startPeriod, addBBT, deleteBBT, clearBBT, addUnprotected, deleteUnprotected,
+    addHistory, updateHistory, deleteHistory, saveCurrentCycle, startPeriod, addBBT, deleteBBT, clearBBT, addUnprotected, deleteUnprotected,
   };
 }

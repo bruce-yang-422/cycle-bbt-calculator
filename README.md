@@ -34,10 +34,12 @@
 - **三種使用目的**：避孕規劃（預設）、月經記錄、備孕規劃，相同計算邏輯搭配不同說明與建議。
 - **無保護記錄**（避孕模式最醒目，其他模式也有低調入口）：輸入發生日期，即顯示當日風險、三種事後避孕方法的時限，以及建議驗孕日，並在首頁提醒。
 - **基礎體溫分析**：自動計算參考線（cover line）與連續升溫天數，附 30 筆走勢圖。
-- **週期歷史**：輸入月經開始日即自動算出週期間隔、平均、最短與最長。
+- **週期歷史**：輸入月經開始日即自動算出週期間隔、平均、最短與最長；記錯日期可直接原地修改，若是目前預估所依據的日期，日曆會一併更新。
 - **分享**：匯出 1080 × 1620 PNG 圖片，或可貼到 LINE 的純文字。
+- **淺色／深色／跟隨系統**：頂端以圖示一鍵切換外觀，選擇會被記住。
 - **八種語言**：繁體中文、English、日本語、한국어、Español、Deutsch、ไทย、Tiếng Việt。
 - **PWA**：可安裝至主畫面，完整離線使用。
+- **關於本站與隱私權政策**：八語版本，可從頁尾、「設定與指南」開啟，或以 `#about`、`#privacy` 網址直接連結。
 
 ## 技術棧
 
@@ -47,7 +49,7 @@
 | 語言 | [TypeScript](https://www.typescriptlang.org/) |
 | 建置 | [Vite](https://vite.dev/) |
 | PWA | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) + [Workbox](https://developer.chrome.com/docs/workbox)（`injectManifest`） |
-| 樣式 | 原生 CSS（design tokens、無 UI 套件） |
+| 樣式 | 原生 CSS（design tokens、淺色／深色主題、無 UI 套件） |
 | 字型 | [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans)、[Noto Sans TC／JP／KR／Thai](https://fonts.google.com/noto) |
 | 測試 | Node.js test runner + [tsx](https://tsx.is/)、[Playwright](https://playwright.dev/) |
 
@@ -104,6 +106,8 @@ npm run preview
 │   │   ├── UnprotectedDialog.vue  無保護記錄與事後避孕時限
 │   │   ├── ShareDialog.vue        圖片／文字分享
 │   │   ├── InstallControls.vue    PWA 安裝提示
+│   │   ├── ThemeToggle.vue        外觀切換
+│   │   ├── InfoDialogs.vue        關於本站與隱私權政策
 │   │   ├── EntryField.vue         共用輸入欄位（含 −／＋ 步進器）
 │   │   └── AppIcon.vue            線條圖示
 │   ├── cycle.ts               週期與體溫演算法（純函式）
@@ -112,6 +116,7 @@ npm run preview
 │   ├── storage.ts             localStorage 讀寫與重置
 │   ├── audience.ts            使用目的文案
 │   ├── region.ts              地區判斷
+│   ├── theme.ts               淺色／深色／跟隨系統
 │   ├── i18n.ts / locales/     國際化與各語言字串
 │   ├── chart.ts / share.ts    Canvas 走勢圖與分享圖片
 │   ├── not-found.ts           多語 404 頁
@@ -195,6 +200,7 @@ npm run preview
 | `audienceMode` | 使用目的（`contraception` / `tracking` / `conception`） |
 | `language` | 介面語言 |
 | `regionPreference` | 地區說明（`auto` / `TW` / `global`） |
+| `theme` | 外觀（`light` / `dark`；未設定即跟隨系統） |
 | `installBannerDismissed` | 是否已關閉安裝提示 |
 
 「設定與指南」頁的「一鍵清除並重置」（`resetAllData()`）會在確認後刪除以上所有鍵值，並回到首次使用狀態。
@@ -202,6 +208,10 @@ npm run preview
 ### 地區判斷
 
 地區選單提供自動／台灣／通用三種選項。自動模式會查詢同網域的 Cloudflare `/cdn-cgi/trace` 端點，只讀取國家欄位 `loc`，不儲存 IP 或完整回應。查詢失敗、離線或未經 Cloudflare 代理時，會改用通用說明，使用者可隨時手動選擇。地區只影響「在台灣尋求協助」的說明內容，不影響介面語言或計算結果。
+
+### 隱私權政策
+
+站內完整政策見「隱私權政策」對話框，或直接開啟 <https://cycle-bbt.stack-base.com/#privacy>。內容更新時，請同步修改 [`InfoDialogs.vue`](src/components/InfoDialogs.vue) 的 `policyDate`。
 
 ### 外部資源
 
@@ -243,6 +253,12 @@ git worktree remove ../gh-pages
 ```
 
 若將 Pages 來源切換為 GitHub Actions，可手動執行 [Deploy to GitHub Pages](.github/workflows/pages.yml) 工作流程，它會自動安裝、測試、建置並發佈 `dist/`。
+
+### 圖示與版本
+
+- 品牌圖形以 [`public/images/logo-cycle.svg`](public/images/logo-cycle.svg) 為準；`favicon.ico` 與 `logo.png` 為其點陣版本。
+- PWA 圖示（`icon-*.png`、`icon-maskable-*.png`、`apple-touch-icon.png`）由 SVG 以瀏覽器引擎逐一尺寸重新繪製，避免點陣縮圖造成模糊；maskable 圖示將圖形保留在中央 80% 安全區內。
+- 「關於本站」顯示的版本號取自 `package.json` 的 `version`，更新日期為建置當天。
 
 ### PWA 快取
 

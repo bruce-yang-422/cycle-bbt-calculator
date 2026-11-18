@@ -15,6 +15,7 @@ const contentTypes = {
   '.css': 'text/css',
   '.png': 'image/png',
   '.ico': 'image/x-icon',
+  '.svg': 'image/svg+xml',
 };
 const languages = ['zh-TW', 'en', 'ja', 'ko', 'es', 'de', 'th', 'vi'];
 const modes = ['tracking', 'contraception', 'conception'];
@@ -100,6 +101,51 @@ async function checkLocalizedPages(page) {
   assert.deepEqual(await cycleSnapshot(page), before);
 }
 
+async function checkTheme(page) {
+  const state = () => page.evaluate(() => [document.documentElement.dataset.theme ?? null, localStorage.getItem('theme')]);
+  const background = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+  await page.emulateMedia({ colorScheme: 'light' });
+  const light = await background();
+  await page.locator('#theme-dark').click();
+  assert.deepEqual(await state(), ['dark', 'dark']);
+  assert.notEqual(await background(), light);
+  assert.equal(await page.locator('#theme-dark').getAttribute('aria-pressed'), 'true');
+  await page.locator('#theme-system').click();
+  assert.deepEqual(await state(), [null, null]);
+  assert.equal(await background(), light);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  assert.notEqual(await background(), light);
+  await page.locator('#theme-light').click();
+  assert.equal(await background(), light);
+  await page.locator('#theme-system').click();
+  await page.emulateMedia({ colorScheme: 'light' });
+}
+
+async function checkInfo(page, origin) {
+  const { version } = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
+  await goTo(page, 'emergency');
+  await page.locator('#languageSelect').selectOption('en');
+  await page.locator('#footerAbout').click();
+  await page.locator('#aboutDialog').waitFor({ state: 'visible' });
+  assert((await page.locator('#aboutVersion').textContent()).includes(version));
+  assert(page.url().endsWith('#about'));
+  await page.locator('#aboutPrivacy').click();
+  await page.locator('#privacyDialog').waitFor({ state: 'visible' });
+  assert.equal(await page.locator('#privacyTitle').textContent(), catalogs.en['privacy.title']);
+  assert(await page.locator('#aboutDialog').isHidden());
+  await page.keyboard.press('Escape');
+  await page.locator('#privacyDialog').waitFor({ state: 'hidden' });
+  await page.waitForFunction(() => !location.hash);
+  await page.locator('#settingsPrivacy').click();
+  await page.locator('#privacyDialog').waitFor({ state: 'visible' });
+  await page.keyboard.press('Escape');
+
+  // A shared link opens the policy directly.
+  await page.goto(origin + '/#privacy', { waitUntil: 'domcontentloaded' });
+  await page.locator('#privacyDialog').waitFor({ state: 'visible' });
+  await page.keyboard.press('Escape');
+}
+
 async function checkPeriodShortcut(page) {
   const settings = () => page.evaluate(() => JSON.parse(localStorage.getItem('cycleSettings')).values.lastPeriod);
   const before = await settings();
@@ -177,6 +223,17 @@ async function checkDraftAndRecords(page) {
     await page.locator('[data-control="control-18"]').click();
   }
   assert.equal(await page.locator('#histList li').count(), 2);
+  assert.match(await page.locator('#histList').innerText(), /30 days/);
+  await page.locator('#histList li').first().locator('.btn-edit').click();
+  await page.locator('#hEdit').fill('2026-01-01');
+  await page.locator('#hEditSave').click();
+  assert.equal(await page.locator('#hEditError').textContent(), catalogs.en['error.duplicate']);
+  await page.locator('#hEdit').fill('2026-01-29');
+  await page.locator('#hEditSave').click();
+  assert.match(await page.locator('#histList').innerText(), /28 days/);
+  await page.locator('#histList li').first().locator('.btn-edit').click();
+  await page.locator('#hEdit').fill('2026-01-31');
+  await page.locator('#hEditSave').click();
   assert.match(await page.locator('#histList').innerText(), /30 days/);
 
   await goTo(page, 'bbt');
@@ -415,6 +472,7 @@ async function main() {
     await page.locator('#startCard button').click();
     await page.locator('#lastPeriod').fill('2026-01-01');
     await page.locator('[data-control="control-30"]').click();
+    await checkTheme(page);
     await checkPeriodShortcut(page);
     await page.locator('#calGrid button[data-date="2026-01-14"]').click();
 
@@ -424,6 +482,7 @@ async function main() {
     await checkOffline(context, page);
     await checkShare(page);
     await checkUnprotected(page);
+    await checkInfo(page, origin);
 
     await context.setOffline(false);
     await page.goto(origin + '/404.html?lang=ja', { waitUntil: 'domcontentloaded' });

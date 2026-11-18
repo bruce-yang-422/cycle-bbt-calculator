@@ -10,7 +10,7 @@ interface InstallPromptEvent extends Event {
 }
 
 const storageKey = 'installBannerDismissed';
-const icon = `${import.meta.env.BASE_URL}images/icon-96.png`;
+const icon = `${import.meta.env.BASE_URL}images/icon-192.png`;
 const standalone = ref(false);
 const appInstalled = ref(false);
 const installInProgress = ref(false);

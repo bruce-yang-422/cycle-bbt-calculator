@@ -12,6 +12,8 @@ import InstallControls from './components/InstallControls.vue'
 import SettingsPage from './components/SettingsPage.vue'
 import ShareDialog from './components/ShareDialog.vue'
 import TemperaturePage from './components/TemperaturePage.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
+import InfoDialogs from './components/InfoDialogs.vue'
 import UnprotectedDialog from './components/UnprotectedDialog.vue'
 
 const pages = [
@@ -34,6 +36,7 @@ const calendar = ref<InstanceType<typeof CalendarPage> | null>(null)
 const temperature = ref<InstanceType<typeof TemperaturePage> | null>(null)
 const share = ref<InstanceType<typeof ShareDialog> | null>(null)
 const unprotectedDialog = ref<InstanceType<typeof UnprotectedDialog> | null>(null)
+const info = ref<InstanceType<typeof InfoDialogs> | null>(null)
 const toast = ref('')
 const toastUndo = ref<(() => void) | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | undefined
@@ -121,7 +124,7 @@ function reset() {
   <a class="skip-link" href="#mainContent">{{ t('skip') }}</a>
   <header class="top-bar">
     <div class="brand">
-      <img class="brand-logo" src="/images/logo.png" width="34" height="34" alt="">
+      <img class="brand-logo" src="/images/logo-cycle.svg" width="34" height="34" alt="">
       <span class="brand-name">{{ t('app.name') }}</span>
     </div>
     <nav class="desk-tabs" :aria-label="t('app.name')">
@@ -138,6 +141,7 @@ function reset() {
         <AppIcon :name="page.icon" :size="18" />{{ t(page.key) }}
       </button>
     </nav>
+    <ThemeToggle @storage-error="notify(t('error.storage'))" />
   </header>
 
   <main id="mainContent" ref="mainContent" class="app-body" tabindex="-1">
@@ -166,9 +170,15 @@ function reset() {
       @reset="reset"
       @storage-error="notify(t('error.storage'))"
       @unprotected="unprotectedDialog?.open()"
+      @info="info?.open($event)"
     />
 
     <InstallControls />
+    <nav class="footer-links" :aria-label="t('about.title')">
+      <button id="footerAbout" type="button" @click="info?.open('about')">{{ t('about.title') }}</button>
+      <span aria-hidden="true">·</span>
+      <button id="footerPrivacy" type="button" @click="info?.open('privacy')">{{ t('privacy.title') }}</button>
+    </nav>
   </main>
 
   <nav class="bottom-nav" :aria-label="t('app.name')">
@@ -195,6 +205,7 @@ function reset() {
   <CycleSettings ref="settings" :cycle="cycle" @notice="notify" @applied="calendar?.hideDetails()" />
   <ShareDialog ref="share" :cycle="cycle" :audience="audience" @notice="notify" />
   <UnprotectedDialog ref="unprotectedDialog" :cycle="cycle" @notice="notify" />
+  <InfoDialogs ref="info" />
 
   <dialog
     id="audienceDialog"
@@ -212,7 +223,7 @@ function reset() {
         <option v-for="code in supportedLanguages" :key="code" :value="code">{{ languageNames[code] }}</option>
       </select>
     </div>
-    <img class="onboard-logo" src="/images/logo.png" width="64" height="64" alt="">
+    <img class="onboard-logo" src="/images/logo-cycle.svg" width="64" height="64" alt="">
     <h2 id="audienceDialogTitle">{{ t('onboard.title') }}</h2>
     <p id="audienceDialogIntro" class="onboard-intro">{{ t('onboard.intro') }}</p>
     <div class="mode-cards" role="group" :aria-label="t('purpose')" data-control="control-33">
@@ -233,6 +244,6 @@ function reset() {
         <AppIcon class="mode-arrow" name="right" :size="18" />
       </button>
     </div>
-    <p class="onboard-note"><AppIcon name="lock" :size="14" />{{ t('privacy') }}</p>
+    <button type="button" class="onboard-note" @click="info?.open('privacy')"><AppIcon name="lock" :size="14" />{{ t('privacy') }} · <u>{{ t('privacy.title') }}</u></button>
   </dialog>
 </template>

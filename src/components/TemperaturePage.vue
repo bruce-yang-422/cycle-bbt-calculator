@@ -3,6 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { formatNumber, language, localizedDate, t } from '../i18n'
 import { localISO } from '../cycle'
 import { drawBBTChart } from '../chart'
+import { isDark } from '../theme'
 import type { useCycle } from '../useCycle'
 import type { AudienceMode } from '../audience'
 import AppIcon from './AppIcon.vue'
@@ -27,7 +28,7 @@ function draw() {
   }
 }
 
-watch([() => props.active, bbt, bbtAnalysis, language], draw, { flush: 'post' })
+watch([() => props.active, bbt, bbtAnalysis, language, isDark], draw, { flush: 'post' })
 watch(chart, (canvas, _, onCleanup) => {
   if (!canvas) return
   const observer = new ResizeObserver(draw)
@@ -68,12 +69,23 @@ function remove(day?: string) {
   if (result.key) emit('notice', t(result.key))
 }
 
-defineExpose({
-  prefill(day: string) {
-    date.value = day
-    temperature.value = bbt.value.find(reading => reading.date === day)?.temp.toFixed(2) ?? ''
-  },
-})
+function prefill(day: string) {
+  date.value = day
+  temperature.value = bbt.value.find(reading => reading.date === day)?.temp.toFixed(2) ?? ''
+  errorField.value = undefined
+  errorKey.value = undefined
+}
+
+/** Loads a reading back into the form; saving the same date overwrites it. */
+async function editReading(day: string) {
+  prefill(day)
+  await nextTick()
+  const input = document.getElementById('bbtTemp')
+  input?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  input?.focus({ preventScroll: true })
+}
+
+defineExpose({ prefill })
 </script>
 
 <template>
@@ -124,6 +136,7 @@ defineExpose({
           <li v-for="reading in recordList" :key="reading.date" class="record">
             <span class="record-date">{{ dateLabel(reading.date) }}</span>
             <span class="record-value">{{ formatNumber(reading.temp, 2) }}°C</span>
+            <button type="button" class="icon-btn btn-del btn-edit" :aria-label="t('action.edit')" @click="editReading(reading.date)"><AppIcon name="edit" :size="17" /></button>
             <button type="button" class="icon-btn btn-del" :aria-label="t('delete')" @click="remove(reading.date)"><AppIcon name="close" :size="18" /></button>
           </li>
         </ul>

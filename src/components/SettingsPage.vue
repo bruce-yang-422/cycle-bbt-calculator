@@ -12,6 +12,7 @@ const emit = defineEmits<{
   reset: []
   'storage-error': []
   unprotected: []
+  info: [page: 'about' | 'privacy']
 }>()
 
 const sources = {
@@ -169,6 +170,14 @@ onMounted(() => {
           <AppIcon name="trash" :size="17" />{{ t('reset.button') }}
         </button>
       </div>
+    </div>
+    <div class="card info-card">
+      <button id="settingsAbout" type="button" class="info-link" @click="emit('info', 'about')">
+        <AppIcon name="sparkle" :size="18" /><span>{{ t('about.title') }}</span><AppIcon class="row-arrow" name="right" :size="16" />
+      </button>
+      <button id="settingsPrivacy" type="button" class="info-link" @click="emit('info', 'privacy')">
+        <AppIcon name="lock" :size="18" /><span>{{ t('privacy.title') }}</span><AppIcon class="row-arrow" name="right" :size="16" />
+      </button>
     </div>
     </div>
 

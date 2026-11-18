@@ -1,6 +1,9 @@
 import { createApp, h } from 'vue'
 import { language, t } from './i18n'
+import { initTheme } from './theme'
 import '../css/not-found.css'
+
+initTheme()
 
 document.documentElement.lang = language.value
 document.title = `404 · ${t('notFound.title')}`

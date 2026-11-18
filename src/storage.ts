@@ -5,7 +5,7 @@ type StorageWriter = Pick<Storage, 'setItem'>;
 
 export const appStorageKeys = [
   'periodHistory', 'bbtData', 'cycleSettings', 'audienceMode', 'language',
-  'regionPreference', 'installBannerDismissed', 'unprotectedLog',
+  'regionPreference', 'installBannerDismissed', 'unprotectedLog', 'theme',
 ] as const;
 
 export type CycleField = 'lastPeriod' | 'cycleLength' | 'minLength' | 'maxLength' | 'periodLength';
