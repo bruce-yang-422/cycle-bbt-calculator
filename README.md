@@ -25,62 +25,50 @@
 
 ## 專案結構
 
+前端使用 Vite、Vue 3、Naive UI 與 TypeScript。Vue 元件負責互動與畫面，週期演算法及儲存規則由 TypeScript 模組處理。
+
 ```text
-index.html                     頁面結構、data-i18n 翻譯標記、PWA／SEO metadata
-404.html                        多語錯誤頁
-manifest.json                   預設 PWA 設定（icons、theme、start_url）
-sw.js                           根目錄 Service Worker，控制版本快取
-sitemap.xml, robots.txt         搜尋引擎設定
-googlea581463e157279ca.html     Google Search Console 擁有權驗證，保留原樣
-CNAME                           GitHub Pages 自訂網域設定
-
-css/
-  app.css                       主程式樣式、響應式排版、多語字型微調
-  not-found.css                 404 頁樣式
-
-js/
-  app.js                        全域狀態、表單、日曆渲染、結果呈現與初始化
-  cycle.js                      週期切分（cycleBBT）、體溫升溫判定（analyzeBBT）、歷史間隔（deriveHistory）
-  storage.js                    localStorage 讀寫、一鍵清除並重置（resetAllData）
-  purposes.js                   三種使用目的的文案切換與「設定與指南」頁內容
-  i18n.js                       語言判斷與切換、日期／數字格式、data-i18n 翻譯注入
-  chart.js                      Canvas 繪製體溫走勢圖
-  pwa.js                        安裝提示（beforeinstallprompt）、iOS 手動安裝說明、Service Worker 註冊
-  region.js                     地區自動判斷（Cloudflare trace）與手動切換
-  share.js                      「分享本次結果」的圖片／文字匯出
-  events.js                     index.html 內 data-control 元素的事件綁定
-  not-found.js                  404 頁多語呈現
-
-locales/
-  zh-TW.js, en.js, ja.js, ko.js, es.js, de.js, th.js, vi.js   各語言字串字典
-  guide-emphasis.js             指南內文的重點詞加粗清單（依語言與 key）
-  manifest.<lang>.json          各語言對應的 PWA 名稱與啟動網址
-
-images/                         圖示、Apple touch icon、OG 分享封面
-tests/
-  bbt.test.cjs                  體溫升溫演算法回歸測試
-  locales.test.cjs              語言字串完整性、參數一致性、來源連結檢查
-  storage.test.cjs              一鍵清除並重置的行為
-  browser.cjs                   Playwright：多語、多用途、多寬度、持久化、離線整合測試
+index.html、404.html           Vite 入口與搜尋引擎 metadata
+vite.config.ts                 兩個 HTML 入口及 PWA 建置
+src/
+  App.vue、main.ts              主程式、首次設定、頁面導覽
+  components/                  日曆、週期設定、體溫、歷史、指南、分享及安裝
+  cycle.ts、useCycle.ts         週期與體溫演算法、反應式狀態
+  storage.ts                   瀏覽器資料讀寫與重置
+  i18n.ts、locales/             語系字串、日期與數字格式
+  audience.ts、region.ts       用途文案與地區資訊
+  chart.ts、share.ts            走勢圖與匯出圖片
+  not-found.ts                 多語 404 頁面
+  sw.ts                        Service Worker 與離線快取
+css/                           主程式與 404 頁的樣式
+public/                        圖檔與 PWA manifest
+CNAME、Google 驗證檔等         根目錄的網站網域與搜尋引擎設定
+locales/tests/                 單元測試與 Playwright 瀏覽器測試
 ```
-
-沒有建置流程，也沒有執行期框架或翻譯服務依賴：所有語言字典隨網站一起載入，`package.json` 只用於安裝測試工具（Playwright），部署時不需要。
 
 ## 本機開發與部署
 
+使用 Node.js 20.19+ 或 22.12+（支援範圍見 `package.json`）。
+
 ```sh
-python -m http.server 8080
+npm ci
+npm run dev
 ```
 
-開啟 `http://localhost:8080`。也可以直接雙擊開啟 `index.html`，但安裝提示與 Service Worker 離線快取需要 `localhost` 或 HTTPS，瀏覽器在 `file://` 底下也可能限制 `localStorage`。
+開啟 Vite 終端機顯示的網址。要驗證 PWA 安裝或離線快取，先建置，再預覽正式產物。
 
-部署時把整個網站（含 `css/`、`js/`、`locales/`、`images/`）原樣上傳到根目錄即可，不需要打包或編譯。網站必須部署在網域根目錄，`sw.js` 需留在根目錄才能涵蓋整站範圍。
+```sh
+npm run build
+npm run preview
+```
+
+建置會將專案根目錄的 `CNAME`、Google 驗證檔、`robots.txt` 和 `sitemap.xml` 原樣複製到 `dist/`。部署時將 `dist/` 的內容發佈到網域根目錄。GitHub Pages 若使用 Actions 部署，請將 `dist/` 設為上傳的網站產物。若使用分支發佈，請將 `dist/` 內容放在設定的發佈來源。
 
 ## 核心邏輯
 
-**週期預估**（[js/app.js](js/app.js) 的 `calculate()`）：依「上次月經第一天」與週期長度，用日曆法推算月經期、受孕期與排卵日。支援「規律週期」（單一平均天數）與「不規律週期」（最短／最長天數區間）兩種模式；已知的下一筆歷史記錄日期會提前截止預估範圍。
+**週期預估**（[src/useCycle.ts](src/useCycle.ts) 與 [src/cycle.ts](src/cycle.ts) 的 `calculateDays()`）：依「上次月經第一天」與週期長度，用日曆法推算月經期、受孕期與排卵日。支援「規律週期」（單一平均天數）與「不規律週期」（最短／最長天數區間）兩種模式；已知的下一筆歷史記錄日期會提前截止預估範圍。
 
-**體溫升溫判定**（[js/cycle.js](js/cycle.js) 的 `analyzeBBT()`）：
+**體溫升溫判定**（[src/cycle.ts](src/cycle.ts) 的 `analyzeBBT()`）：
 
 1. 取升溫前連續 6 天的最高體溫 + 0.05°C 作為參考線（cover line）。
 2. 需連續 3 個以上日曆日的體溫高於或等於參考線，且持續到查詢日，才視為升溫趨勢確立。
@@ -89,7 +77,7 @@ python -m http.server 8080
 
 這是未經臨床驗證的輔助趨勢規則，不作排卵日診斷，也不保證避孕或受孕效果。
 
-**歷史記錄**（[js/cycle.js](js/cycle.js) 的 `deriveHistory()`）：只需輸入月經開始日，N 筆日期會自動算出 N−1 個完整週期；新增、補登或刪除日期後即時重算統計。週期設定只在使用者送出後才寫入 `localStorage`；歷史記錄只在使用者主動按「從記錄帶入」時才回填到設定表單。
+**歷史記錄**（[src/cycle.ts](src/cycle.ts) 的 `deriveHistory()`）：只需輸入月經開始日，N 筆日期會自動算出 N−1 個完整週期；新增、補登或刪除日期後即時重算統計。週期設定只在使用者送出後才寫入 `localStorage`；歷史記錄只在使用者主動按「從記錄帶入」時才回填到設定表單。
 
 ## 語言與使用目的
 
@@ -103,7 +91,7 @@ python -m http.server 8080
 
 首次使用時會詢問使用者選擇用途，之後不再重複詢問，可從「設定與指南」頁的下拉選單隨時修改。
 
-字串統一放在 `locales/<語言>.js`，每個語言檔必須有相同的鍵值，`{n}`、`{date}` 等參數名稱也必須一致（由 `tests/locales.test.cjs` 檢查）。HTML 靜態文字用 `data-i18n` / `data-i18n-aria` 標記，動態內容一律呼叫 `t(key, values)`，不可以在程式或標記中直接寫死特定語言的文案。
+字串統一放在 `src/locales/<語言>.ts`。各語言使用相同的鍵值和 `{n}`、`{date}` 等參數名稱。Vue 元件透過 `t(key, values)` 顯示翻譯。
 
 ## 本機資料與儲存鍵值
 
@@ -121,13 +109,13 @@ python -m http.server 8080
 
 更新程式不會清除既有記錄；清除瀏覽器的網站資料則會移除全部記錄與偏好。
 
-「設定與指南」頁提供「一鍵清除並重置」（[js/storage.js](js/storage.js) 的 `resetAllData()`）：經二次確認後刪除上述所有鍵值，重新整理頁面並回到首次使用狀態，不影響同瀏覽器內其他網站的資料；若瀏覽器阻擋寫入導致刪除不完整，會提示使用者，且不會執行重新整理。
+「設定與指南」頁提供「一鍵清除並重置」（[src/storage.ts](src/storage.ts) 的 `resetAllData()`）：經確認對話框同意後刪除上述所有鍵值，重新整理頁面並回到首次使用狀態，不影響同瀏覽器內其他網站的資料；若瀏覽器阻擋寫入導致刪除不完整，會提示使用者，且不會執行重新整理。
 
 ## 地區化說明來源
 
 三種用途的建議與參考頁提供通用資訊，另外準備了八語版本的台灣地區說明（在地就醫、諮詢管道等）。地區與語言彼此獨立——例如台灣 IP 搭配越南文介面時，仍以越南文顯示台灣的婦產科名稱與諮詢資訊，不會改變週期計算、記錄或介面語言本身。
 
-「設定與指南」頁的地區選單提供自動／台灣／通用三個選項，手動選擇會存在 `regionPreference`，離線時仍然有效。自動模式（[js/region.js](js/region.js)）會查詢同網域的 `/cdn-cgi/trace` 端點，只讀取 IP 所在國家欄位 `loc`（不讀取資料中心位置 `colo`），不會儲存或記錄完整回應、IP 或判斷結果；回應內容含 IP，只由瀏覽器暫時接收處理，程式不會加入任何回應記錄或分析追蹤，也不會呼叫第三方定位服務或傳送月經、體溫資料。VPN 等因素可能影響 IP 對應的地區判斷，使用者可以隨時手動修正。
+「設定與指南」頁的地區選單提供自動／台灣／通用三個選項，手動選擇會存在 `regionPreference`，離線時仍然有效。自動模式（[src/region.ts](src/region.ts)）會查詢同網域的 `/cdn-cgi/trace` 端點，只讀取 IP 所在國家欄位 `loc`（不讀取資料中心位置 `colo`），不會儲存或記錄完整回應、IP 或判斷結果；回應內容含 IP，只由瀏覽器暫時接收處理，程式不會加入任何回應記錄或分析追蹤，也不會呼叫第三方定位服務或傳送月經、體溫資料。VPN 等因素可能影響 IP 對應的地區判斷，使用者可以隨時手動修正。
 
 **GitHub Pages 部署備註：** 若自訂網域已透過 Cloudflare 代理（DNS 橘雲），可直接使用其同網域 trace 端點，不需要搬離 GitHub Pages。若使用 Cloudflare 純 DNS（灰雲）或直接使用 `github.io` 網域，則沒有此端點；在偵測失敗、離線、逾時或回應格式不符時，頁面會明確顯示「無法判斷」並改用通用說明，使用者仍可手動選擇台灣。本專案不會、也無法自行修改 DNS 設定。自動查詢的結果不會進入 Service Worker 快取，手動選擇一律優先於尚未完成的自動偵測請求。
 
@@ -144,7 +132,7 @@ python -m http.server 8080
 
 ## 分享本次結果
 
-日曆下方的「分享本次結果」（[js/share.js](js/share.js)）提供預覽與兩種匯出方式：
+日曆下方的「分享本次結果」（[src/share.ts](src/share.ts)）提供預覽與兩種匯出方式：
 
 - **圖片**：在本機用 Canvas 產生 1080 × 1620 的 PNG（2:3 比例）。上方 1080 × 1080 為完整週期日曆（可跨月、跨年），下方為使用目的與週期摘要卡片。可直接下載，或交由裝置的分享選單傳送。
 - **文字**：純文字加 emoji，不含 Markdown 語法，可複製後貼到 LINE 等聊天工具，或同樣使用裝置分享選單。
@@ -155,24 +143,25 @@ python -m http.server 8080
 
 八種語言與各自的 `manifest.<lang>.json` 全部預先快取，離線時仍可切換語言；各語言 manifest 共用同一個 app ID，已安裝 App 之後系統顯示名稱的更新方式則依瀏覽器而定。
 
-**每次發布修改都要更新 [sw.js](sw.js) 的 `CACHE_NAME`**，新增必要檔案時同步加入 `PRECACHE_URLS`，確保 HTML、腳本與語系檔案來自同一個版本。啟用新版本時只會刪除本 App 自己的舊快取，不會清除 `localStorage` 或其他網站的快取。頁面內對外部網站的參考連結需要網路才能開啟。
+建置時 Vite 產生帶有內容雜湊的檔名，Workbox 依每次建置產物更新離線快取。新版本會清除舊版 App 的快取，並保留 `localStorage` 的既有記錄。頁面內對外部網站的參考連結需要網路才能開啟。
 
 ## 測試
 
 ```sh
-npm install
-npx playwright install chromium   # 僅瀏覽器測試需要
-npm test                          # node --test tests/*.test.cjs
-npm run test:browser              # node tests/browser.cjs
+npm ci
+npx playwright install chromium
+npm run typecheck
+npm test
+npm run test:browser
 ```
 
-`npm test` 只需要 Node.js，不需要先安裝套件，涵蓋：
+`npm test` 涵蓋：
 
-- [bbt.test.cjs](tests/bbt.test.cjs)：體溫升溫演算法回歸
-- [locales.test.cjs](tests/locales.test.cjs)：語言字串鍵值完整性、`{n}`／`{date}` 等參數一致性、來源連結檢查
-- [storage.test.cjs](tests/storage.test.cjs)：一鍵清除並重置的行為（確認取消、失敗提示、成功後保留其他網站資料）
+- [bbt.test.cjs](locales/tests/bbt.test.cjs)：體溫升溫演算法回歸
+- [locales.test.cjs](locales/tests/locales.test.cjs)：語言字串鍵值完整性、`{n}`／`{date}` 等參數一致性、來源連結檢查
+- [storage.test.cjs](locales/tests/storage.test.cjs)：一鍵清除並重置的行為（確認取消、失敗提示、成功後保留其他網站資料）
 
-`npm run test:browser` 用 Playwright 自行啟動暫時的本機伺服器，涵蓋八種語言 × 三種使用目的 × 四個頁面 × 三種螢幕寬度，並驗證首次設定流程、設定持久化、表單草稿保留、月經／體溫記錄與離線切換。所有瀏覽器測試都使用互相隔離的瀏覽器資料，不會互相污染。
+`npm run test:browser` 先建置，再用 Playwright 和暫時的本機伺服器測試 `dist/`，涵蓋八種語言 × 三種使用目的 × 四個頁面 × 三種螢幕寬度，並驗證首次設定流程、設定持久化、表單草稿保留、月經／體溫記錄與離線切換。所有瀏覽器測試都使用互相隔離的瀏覽器資料，不會互相污染。
 
 ## 字型與授權
 
