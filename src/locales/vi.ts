@@ -2,6 +2,8 @@ export default {
   "app.name": "Chu kỳ & thân nhiệt",
   "app.title": "Hiểu chu kỳ của bạn",
   "app.subtitle": "Ghi lại kinh nguyệt và thân nhiệt theo cách của bạn.",
+  "seo.title": "Chu kỳ & thân nhiệt – Tính chu kỳ kinh nguyệt, ngày rụng trứng và thân nhiệt cơ bản (BBT)",
+  "seo.description": "Công cụ miễn phí ghi lại chu kỳ kinh nguyệt và thân nhiệt cơ bản (BBT). Dự đoán kỳ kinh, thời kỳ dễ thụ thai và ngày rụng trứng, kèm biểu đồ thân nhiệt. Dữ liệu chỉ lưu trên thiết bị của bạn, không cần đăng ký, dùng được ngoại tuyến.",
   "privacy": "Chỉ lưu trên thiết bị của bạn",
   "language": "Ngôn ngữ",
   "purpose": "Mục đích",

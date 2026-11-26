@@ -168,6 +168,7 @@ The site makes only two kinds of external request: Google Fonts, and the same-do
 - Strings live in `src/locales/<lang>.ts` and components use `t(key, values)`; dates and numbers are formatted with `Intl`.
 - Unit tests check that all eight languages have identical keys and the same placeholders such as `{n}`, and that every key referenced in source exists.
 - To add a language, add `src/locales/<lang>.ts` and `public/locales/manifest.<lang>.json`, and register it in `supportedLanguages` in `i18n.ts`.
+- SEO: each language has its own `?lang=<lang>` URL, cross-linked with hreflang in `index.html` and `sitemap.xml` (bare `/` is `x-default`). `syncLocalizedMetadata()` rewrites `<title>`, description, Open Graph, JSON-LD and canonical for the current language using `seo.title` and `seo.description`; when adding a language, also add it to the hreflang links and the sitemap.
 
 ## Deployment
 

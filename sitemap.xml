@@ -1,9 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://cycle-bbt.stack-base.com/</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=zh-TW</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=en</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=ja</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=ko</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=es</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=de</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=th</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
+  </url>
+  <url>
+    <loc>https://cycle-bbt.stack-base.com/?lang=vi</loc>
+    <lastmod>2026-11-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/"/>
   </url>
 </urlset>

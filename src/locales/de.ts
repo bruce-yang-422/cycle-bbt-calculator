@@ -2,6 +2,8 @@ export default {
   "app.name": "Zyklus & Temperatur",
   "app.title": "Verstehe deinen Zyklus",
   "app.subtitle": "Erfasse Periode und Temperatur auf deine Weise.",
+  "seo.title": "Zyklus & Temperatur – Zyklus-, Eisprung- und Basaltemperatur-Rechner",
+  "seo.description": "Kostenloser Zyklus- und Basaltemperatur-Tracker: Periode, fruchtbare Tage und Eisprung berechnen und die Temperaturkurve ansehen. Deine Daten bleiben auf deinem Gerät – ohne Anmeldung, auch offline.",
   "privacy": "Nur auf deinem Gerät gespeichert",
   "language": "Sprache",
   "purpose": "Zweck",

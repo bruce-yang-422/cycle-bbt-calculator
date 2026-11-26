@@ -3,43 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>週期與體溫</title>
-    <meta name="description" content="免費線上週期體溫避孕計算器，結合日曆法與基礎體溫（BBT）記錄參考，預估週期日期，提供體溫記錄與使用目的專屬說明。所有資料僅存於本機，完全保護隱私。">
-    <meta name="keywords" content="避孕計算器,排卵預測,基礎體溫,BBT,月經週期,安全期,受孕期,週期計算,症狀體溫法,STM,自然避孕">
+    <title>週期與體溫｜月經週期、排卵日與基礎體溫 BBT 計算器</title>
+    <meta name="description" content="免費月經週期與基礎體溫（BBT）記錄工具：依日曆法預估月經期、排卵日與受孕期，繪製體溫走勢與參考線，適用避孕規劃、備孕與月經記錄。資料只存在你的裝置，免註冊、可離線使用。">
+    <meta name="keywords" content="月經週期,經期計算,排卵日計算,基礎體溫,BBT,受孕期,安全期,週期計算器,症狀體溫法,自然避孕,備孕">
     <meta name="author" content="Bruce Yang">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://cycle-bbt.stack-base.com/">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="application-name" content="週期與體溫">
+    <!-- canonical 由 src/i18n.ts 依網址的 ?lang= 設定，靜態 HTML 不放以免與渲染結果衝突 -->
+    <link rel="alternate" hreflang="zh-TW" href="https://cycle-bbt.stack-base.com/?lang=zh-TW">
+    <link rel="alternate" hreflang="en" href="https://cycle-bbt.stack-base.com/?lang=en">
+    <link rel="alternate" hreflang="ja" href="https://cycle-bbt.stack-base.com/?lang=ja">
+    <link rel="alternate" hreflang="ko" href="https://cycle-bbt.stack-base.com/?lang=ko">
+    <link rel="alternate" hreflang="es" href="https://cycle-bbt.stack-base.com/?lang=es">
+    <link rel="alternate" hreflang="de" href="https://cycle-bbt.stack-base.com/?lang=de">
+    <link rel="alternate" hreflang="th" href="https://cycle-bbt.stack-base.com/?lang=th">
+    <link rel="alternate" hreflang="vi" href="https://cycle-bbt.stack-base.com/?lang=vi">
+    <link rel="alternate" hreflang="x-default" href="https://cycle-bbt.stack-base.com/">
 
     <!-- Open Graph -->
     <meta property="og:type"        content="website">
     <meta property="og:url"         content="https://cycle-bbt.stack-base.com/">
-    <meta property="og:title"       content="週期體溫避孕計算器 — 排卵預測 × BBT 基礎體溫追蹤">
-    <meta property="og:description" content="免費線上工具，結合日曆法與 BBT 基礎體溫記錄參考，預估週期日期，提供體溫記錄與使用目的專屬說明。100% 本機運算，隱私安全。">
+    <meta property="og:title"       content="週期與體溫｜月經週期、排卵日與基礎體溫 BBT 計算器">
+    <meta property="og:description" content="依日曆法預估月經期、排卵日與受孕期，記錄基礎體溫並繪製走勢圖。資料只存在你的裝置，免註冊、可離線使用。">
     <meta property="og:image"       content="https://cycle-bbt.stack-base.com/images/og-cover.png">
+    <meta property="og:image:alt"   content="週期與體溫：月經週期、排卵日與基礎體溫計算器">
     <meta property="og:locale"      content="zh_TW">
-    <meta property="og:site_name"   content="週期體溫避孕計算器">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta property="og:locale:alternate" content="ko_KR">
+    <meta property="og:locale:alternate" content="es_ES">
+    <meta property="og:locale:alternate" content="de_DE">
+    <meta property="og:locale:alternate" content="th_TH">
+    <meta property="og:locale:alternate" content="vi_VN">
+    <meta property="og:site_name"   content="週期與體溫">
 
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary_large_image">
-    <meta name="twitter:url"         content="https://cycle-bbt.stack-base.com/">
-    <meta name="twitter:title"       content="週期體溫避孕計算器 — 排卵預測 × BBT 基礎體溫追蹤">
-    <meta name="twitter:description" content="免費線上工具，結合日曆法與 BBT 基礎體溫記錄參考，預估週期日期，提供體溫記錄與使用目的專屬說明。100% 本機運算，隱私安全。">
+    <meta name="twitter:title"       content="週期與體溫｜月經週期、排卵日與基礎體溫 BBT 計算器">
+    <meta name="twitter:description" content="依日曆法預估月經期、排卵日與受孕期，記錄基礎體溫並繪製走勢圖。資料只存在你的裝置，免註冊、可離線使用。">
     <meta name="twitter:image"       content="https://cycle-bbt.stack-base.com/images/og-cover.png">
+    <meta name="twitter:image:alt"   content="週期與體溫：月經週期、排卵日與基礎體溫計算器">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "週期體溫避孕計算器",
+      "name": "週期與體溫｜月經週期、排卵日與基礎體溫 BBT 計算器",
+      "alternateName": "週期與體溫",
       "url": "https://cycle-bbt.stack-base.com/",
-      "description": "結合日曆計算法與基礎體溫（BBT）的記錄參考，協助預測排卵日、受孕期與安全期。",
+      "description": "免費月經週期與基礎體溫（BBT）記錄工具：依日曆法預估月經期、排卵日與受孕期，繪製體溫走勢與參考線，適用避孕規劃、備孕與月經記錄。資料只存在你的裝置，免註冊、可離線使用。",
       "applicationCategory": "HealthApplication",
       "operatingSystem": "Any",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "author": { "@type": "Person", "name": "Bruce Yang" },
+      "image": "https://cycle-bbt.stack-base.com/images/og-cover.png",
       "inLanguage": "zh-TW",
-      "keywords": "避孕計算器,排卵預測,基礎體溫,BBT,月經週期,安全期"
+      "availableLanguage": ["zh-TW", "en", "ja", "ko", "es", "de", "th", "vi"],
+      "featureList": ["月經週期預估", "排卵日與受孕期日曆", "基礎體溫記錄與走勢圖", "事後避孕時限提醒", "CSV 備份", "離線使用"]
     }
     </script>
 

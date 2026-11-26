@@ -24,7 +24,18 @@ export const languageNames: Record<Language, string> = {
   vi: 'Tiếng Việt',
 }
 
-export const catalogs: Record<Language, Record<TranslationKey, string>> = {
+const ogLocales: Record<Language, string> = {
+  'zh-TW': 'zh_TW',
+  en: 'en_US',
+  ja: 'ja_JP',
+  ko: 'ko_KR',
+  es: 'es_ES',
+  de: 'de_DE',
+  th: 'th_TH',
+  vi: 'vi_VN',
+}
+
+export const catalogs:Record<Language, Record<TranslationKey, string>> = {
   'zh-TW': zhTW,
   en,
   ja,
@@ -91,29 +102,41 @@ export function localizedDate(
 export function syncLocalizedMetadata(): void {
   if (typeof document === 'undefined') return
 
-  const title = t('app.name')
-  const description = t('app.subtitle')
+  const name = t('app.name')
+  const title = t('seo.title')
+  const description = t('seo.description')
+  const base = import.meta.env?.BASE_URL ?? '/'
   document.documentElement.lang = language.value
   document.title = title
 
   const manifest = document.querySelector<HTMLLinkElement>('link[rel="manifest"]')
-  if (manifest) {
-    const base = import.meta.env?.BASE_URL ?? '/'
-    manifest.href = `${base}locales/manifest.${language.value}.json`
+  if (manifest) manifest.href = `${base}locales/manifest.${language.value}.json`
+
+  // 只有網址帶 ?lang= 時才是該語言的專屬網址，否則視為 x-default 首頁。
+  const pageUrl = new URL(base, window.location.origin)
+  if (new URL(window.location.href).searchParams.has('lang')) pageUrl.searchParams.set('lang', language.value)
+  let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+  if (!canonical) {
+    canonical = document.createElement('link')
+    canonical.rel = 'canonical'
+    document.head.append(canonical)
   }
+  canonical.href = pageUrl.href
 
-  document.querySelectorAll<HTMLMetaElement>(
-    'meta[property="og:title"], meta[name="twitter:title"], meta[name="apple-mobile-web-app-title"]',
-  ).forEach(element => { element.content = title })
-
-  document.querySelectorAll<HTMLMetaElement>(
-    'meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]',
-  ).forEach(element => { element.content = description })
+  const setMeta = (selector: string, content: string) => {
+    document.querySelectorAll<HTMLMetaElement>(selector).forEach(element => { element.content = content })
+  }
+  setMeta('meta[property="og:title"], meta[name="twitter:title"]', title)
+  setMeta('meta[name="apple-mobile-web-app-title"], meta[name="application-name"], meta[property="og:site_name"]', name)
+  setMeta('meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]', description)
+  setMeta('meta[property="og:url"]', pageUrl.href)
+  setMeta('meta[property="og:locale"]', ogLocales[language.value])
 
   const structuredData = document.querySelector('script[type="application/ld+json"]')
   if (structuredData?.textContent) {
     const schema = JSON.parse(structuredData.textContent)
     schema.name = title
+    schema.alternateName = name
     schema.description = description
     schema.inLanguage = language.value
     structuredData.textContent = JSON.stringify(schema)

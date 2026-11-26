@@ -2,6 +2,8 @@ export default {
   "app.name": "Ciclo y temperatura",
   "app.title": "Conoce tu ciclo",
   "app.subtitle": "Registra tu ciclo y temperatura a tu manera.",
+  "seo.title": "Ciclo y temperatura: calculadora de ciclo menstrual, ovulación y temperatura basal",
+  "seo.description": "Herramienta gratuita para registrar tu ciclo menstrual y tu temperatura basal. Estima tu periodo, tu ventana fértil y la ovulación, y consulta la gráfica de temperatura. Tus datos se quedan en tu dispositivo, sin registro y sin conexión.",
   "privacy": "Solo en tu dispositivo",
   "language": "Idioma",
   "purpose": "Objetivo",

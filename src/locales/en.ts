@@ -2,6 +2,8 @@ export default {
   "app.name": "Cycle & Temperature",
   "app.title": "Understand your cycle",
   "app.subtitle": "Track periods and temperature, your way.",
+  "seo.title": "Cycle & Temperature – Period, Ovulation & BBT Calculator",
+  "seo.description": "Free period and basal body temperature (BBT) tracker. Estimate your period, fertile window and ovulation, and chart your BBT. Data stays on your device – no sign-up, works offline.",
   "privacy": "Stored only on your device",
   "language": "Language",
   "purpose": "Purpose",

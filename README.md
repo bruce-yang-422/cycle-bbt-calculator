@@ -168,6 +168,7 @@ preference,language,zh-TW
 - 字串位於 `src/locales/<lang>.ts`，元件以 `t(key, values)` 取用；日期與數字以 `Intl` 格式化。
 - 單元測試會檢查：八種語言的鍵值完全一致、`{n}` 等參數相同，以及原始碼引用的鍵值都存在。
 - 新增語言：新增 `src/locales/<lang>.ts`、`public/locales/manifest.<lang>.json`，並加入 `i18n.ts` 的 `supportedLanguages`。
+- SEO：每種語言都有 `?lang=<lang>` 專屬網址，`index.html` 與 `sitemap.xml` 以 hreflang 互相標示（不帶參數的 `/` 為 `x-default`）。`syncLocalizedMetadata()` 會依目前語言改寫 `<title>`、描述、Open Graph、JSON-LD 與 canonical，文案取自 `seo.title`、`seo.description`；新增語言時請一併加入 hreflang 與 sitemap。
 
 ## 部署
 
