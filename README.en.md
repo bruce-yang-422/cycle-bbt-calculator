@@ -172,23 +172,9 @@ The site makes only two kinds of external request: Google Fonts, and the same-do
 
 ## Deployment
 
-The production site is published by GitHub Pages from the root of the `gh-pages` branch (`.nojekyll` must be kept):
+The production site is deployed by the [GitHub Actions workflow](.github/workflows/pages.yml): every push to `main` runs the tests, builds, and publishes `dist/` to GitHub Pages, with no deployment branch. It can also be run manually from the Actions tab.
 
-```sh
-npm run build
-git fetch origin gh-pages
-git worktree add ../gh-pages origin/gh-pages --detach
-cd ../gh-pages
-git ls-files | grep -v '^\.nojekyll$' | xargs git rm -q
-cp -r ../cycle-bbt-calculator/dist/. .
-git add -A
-git commit -m "deploy: 發佈網站 / publish website"
-git push origin HEAD:gh-pages
-cd -
-git worktree remove ../gh-pages
-```
-
-A manually triggered [GitHub Actions workflow](.github/workflows/pages.yml) is also available if the Pages source is switched to Actions.
+For first-time setup, go to the repository's **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**.
 
 - The version comes from `package.json` and the build date is injected at build time (`__APP_VERSION__`, `__BUILD_DATE__`).
 - The brand mark is defined by [`logo-cycle.svg`](public/images/logo-cycle.svg); PWA icons are re-rendered from it at each size, and maskable versions keep an 80% safe zone.

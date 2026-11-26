@@ -172,23 +172,9 @@ preference,language,zh-TW
 
 ## 部署
 
-正式站由 GitHub Pages 發佈 `gh-pages` 分支根目錄（需保留 `.nojekyll`）：
+正式站由 [GitHub Actions 工作流程](.github/workflows/pages.yml) 部署：每次推送到 `main` 會自動執行測試、建置並發佈 `dist/` 到 GitHub Pages，不使用部署分支。也可在 Actions 頁面手動執行。
 
-```sh
-npm run build
-git fetch origin gh-pages
-git worktree add ../gh-pages origin/gh-pages --detach
-cd ../gh-pages
-git ls-files | grep -v '^\.nojekyll$' | xargs git rm -q
-cp -r ../cycle-bbt-calculator/dist/. .
-git add -A
-git commit -m "deploy: 發佈網站 / publish website"
-git push origin HEAD:gh-pages
-cd -
-git worktree remove ../gh-pages
-```
-
-另有可手動執行的 [GitHub Actions 工作流程](.github/workflows/pages.yml)，適用於將 Pages 來源改為 Actions 的情況。
+首次設定時，請到 GitHub 儲存庫的 **Settings → Pages → Build and deployment → Source** 選擇 **GitHub Actions**。
 
 - 版本號取自 `package.json`，建置日期在建置時注入（`__APP_VERSION__`、`__BUILD_DATE__`）。
 - 品牌圖形以 [`logo-cycle.svg`](public/images/logo-cycle.svg) 為準；PWA 圖示由此 SVG 逐一尺寸重新繪製，maskable 版本保留 80% 安全區。
